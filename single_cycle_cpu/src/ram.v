@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`include "defines.v"
 
 module RAM (
     input clk,
@@ -10,16 +11,6 @@ module RAM (
     input [31:0] rd_addr,
     output reg [31:0] rd_data
 );
-    
-    parameter LB  = 3'b001;
-    parameter LBU = 3'b010;
-    parameter LH  = 3'b011;
-    parameter LHU = 3'b100;
-    parameter LW  = 3'b101;
-    
-    parameter SB = 2'b01;
-    parameter SH = 2'b10;
-    parameter SW = 2'b11;
             
     reg [7:0] mem[127:0];
     
@@ -31,11 +22,11 @@ module RAM (
         if(rd_addr[31:7]) rd_data = 0;
         else begin
             case(rd_ctrl)
-                LB:  rd_data = {{24{mem[rd_addr[6:0]][7]}}, mem[rd_addr[6:0]]}; //sign extension
-                LBU: rd_data = {24'b0, mem[rd_addr][6:0]};
-                LH:  rd_data = {{16{mem[rd_addr[6:0] + 1]}}, mem[rd_addr[6:0] + 1], mem[rd_addr[6:0]]};
-                LHU: rd_data = {16'b0, mem[rd_addr[6:0] + 1], mem[rd_addr[6:0]]};
-                LW : rd_data = {mem[rd_addr[6:0] + 3], mem[rd_addr[6:0] + 2], mem[rd_addr[6:0] + 1], mem[rd_addr[6:0]]};
+                `LB:  rd_data = {{24{mem[rd_addr[6:0]][7]}}, mem[rd_addr[6:0]]}; //sign extension
+                `LBU: rd_data = {24'b0, mem[rd_addr][6:0]};
+                `LH:  rd_data = {{16{mem[rd_addr[6:0] + 1]}}, mem[rd_addr[6:0] + 1], mem[rd_addr[6:0]]};
+                `LHU: rd_data = {16'b0, mem[rd_addr[6:0] + 1], mem[rd_addr[6:0]]};
+                `LW : rd_data = {mem[rd_addr[6:0] + 3], mem[rd_addr[6:0] + 2], mem[rd_addr[6:0] + 1], mem[rd_addr[6:0]]};
                 default: rd_data = 32'b0;
             endcase
         end
@@ -44,12 +35,12 @@ module RAM (
     always @(posedge clk) begin
         if(wr_en & ~|wr_addr[31:7]) begin
             case(wr_addr)
-                SB: mem[wr_addr[6:0]] = wr_data[7:0];
-                SH: begin
+                `SB: mem[wr_addr[6:0]] = wr_data[7:0];
+                `SH: begin
                         mem[wr_addr[6:0] + 1] = wr_data[15:8];
                         mem[wr_addr[6:0]] = wr_data[7:0];
                     end
-                SW: begin
+                `SW: begin
                         mem[wr_addr[6:0] + 3] = wr_data[31:24];
                         mem[wr_addr[6:0] + 2] = wr_data[23:16];
                         mem[wr_addr[6:0] + 1] = wr_data[15:8];

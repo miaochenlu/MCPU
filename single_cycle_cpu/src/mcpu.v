@@ -4,7 +4,7 @@ module MCPU(
     input clk,
     input rst
 );
-    wire [31:0] next_pc, pc, pc_plus4;
+    wire [31:0] pc, pc_plus4, jump_pc, next_pc;
     
     wire [31:0] inst;
     
@@ -31,7 +31,6 @@ module MCPU(
     wire [2:0] BrType;
     wire BranchRes; 
     wire Jump;
-    wire [31:0] jump_pc;
     
     PC M_PC(
         .clk(clk), 
@@ -40,13 +39,11 @@ module MCPU(
         .pc_out(pc)
     );
     
-    wire [6:0] inst_addr = pc[8:2];
     ROM M_ROM (
-        .addr(inst_addr),
+        .addr(pc[8:2]),
         .rd_data(inst)
     );
-//    assign pc_plus4 = pc + 32'd4;
-//    assign next_pc =  pc_plus4;
+
     CtrlUnit M_CtrlUnit (
         .inst(inst),
         .BrType(BrType),
@@ -105,7 +102,6 @@ module MCPU(
     assign pc_plus4 = pc + 32'd4;
     assign jump_pc = pc + ImmOut;
     assign next_pc = DoJump ?  jump_pc : pc_plus4;
-//    assign next_pc = pc_plus4;
         
     ALU M_ALU (
         .ALUSrcA(ALUSrcA),

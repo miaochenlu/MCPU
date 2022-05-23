@@ -3,8 +3,11 @@
 
 module CtrlUnit(
     input [31:0] inst,
+    output RS1Use,
+    output RS2Use,
     output [2:0] BrType,
-    output Jump,
+    output Jal,
+    output Jalr,
     output [3:0] ImmSel,
     output ALUSrcASel,
     output ALUSrcBSel,
@@ -94,7 +97,7 @@ module CtrlUnit(
     wire is_U_type = is_lui | is_auipc;
     
     // assign ctrl signals    
-    assign Jump = is_J_type;
+    assign Jal = is_J_type;
     
     assign RegWrite = is_R_type | is_I_type | is_U_type | is_J_type;                                                                          
     assign MemRW = is_S_type;
@@ -140,5 +143,9 @@ module CtrlUnit(
                    | {4{is_sra | is_srai}} & `SRA
                    | {4{is_jal | is_jalr}} & `AP4
                    | {4{is_lui}} & `OUTB;
-                   
+    assign RS1Use = is_R_type | is_I_type | is_S_type | is_B_type | is_jalr;
+    assign RS2Use = is_R_type | is_S_type | is_B_type;
+    
+    assign Jalr = is_jalr;
+    
 endmodule

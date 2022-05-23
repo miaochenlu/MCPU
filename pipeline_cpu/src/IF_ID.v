@@ -4,32 +4,39 @@ module IF_ID(
     input clk,
     input rst,
     input EN,
+    input flush,
+    input stall,
     input [31:0] PC_IF,
     input [31:0] inst_IF,
     
-    output [31:0] PC_ID,
-    output [31:0] inst_ID
+    output reg [31:0] PC_ID,
+    output reg [31:0] inst_ID
 );
 
-    reg [31:0] PC_ID_Reg;
-    reg [31:0] inst_ID_Reg;
-    
     always @(posedge clk) begin
         if(rst) begin
-            PC_ID_Reg <= 0;
-            inst_ID_Reg <= 0;
+            PC_ID <= 0;
+            inst_ID <= 0;
         end
         else if(EN) begin
-            PC_ID_Reg <= PC_IF;
-            inst_ID_Reg <= inst_IF;
+            if(stall) begin
+                PC_ID   <= PC_ID;
+                inst_ID <= inst_ID;
+            end
+            else if(flush) begin
+                PC_ID   <= PC_ID;
+                inst_ID <= 32'h00002003; // nop lw zero, 0(zero)
+            end
+            else begin
+                PC_ID   <= PC_IF;
+                inst_ID <= inst_IF;
+            end
         end
         else begin
-            PC_ID_Reg <= PC_ID_Reg;
-            inst_ID_Reg <= inst_ID_Reg;
+            PC_ID   <= PC_ID;
+            inst_ID <= inst_ID;
         end
     end
     
-    assign PC_ID = PC_ID_Reg;
-    assign inst_ID = inst_ID_Reg;
     
 endmodule

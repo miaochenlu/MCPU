@@ -8,6 +8,8 @@ module MCPU(
     // IF
     wire PC_EN_IF;
     wire IF_ID_EN; 
+    wire IF_ID_Stall;
+    wire IF_ID_Flush;
     wire [31:0] PC_IF;
     wire [31:0] inst_IF;
     wire [31:0] NextPC;
@@ -15,10 +17,14 @@ module MCPU(
     
     // ID
     wire ID_EX_EN;
+    wire ID_EX_Flush;
     wire [31:0] PC_ID;
     wire [31:0] inst_ID;
+    wire RS1Use;
+    wire RS2Use;
     wire [2:0] BrType_ID;
-    wire Jump_ID;
+    wire Jal;
+    wire Jalr;
     wire [3:0] ImmSel_ID;
     wire [31:0] imm_ID;
     wire ALUSrcASel_ID;
@@ -36,6 +42,10 @@ module MCPU(
     
     wire DoJump;
     wire [31:0] JumpPC;
+    wire [31:0] JumpPCBase;
+    
+    wire [4:0] raddr1_ID;
+    wire [4:0] raddr2_ID;
     
     // EX
     wire EX_MEM_EN;
@@ -86,7 +96,7 @@ module MCPU(
     
     wire [31:0] wdata_WB;
     
-    assign PC_EN_IF = 1;
+//    assign PC_EN_IF = 1;
     assign IF_ID_EN = 1;
     assign ID_EX_EN = 1;
     assign EX_MEM_EN = 1;
@@ -119,6 +129,8 @@ module MCPU(
         .clk(clk),
         .rst(rst),
         .EN(IF_ID_EN),
+        .stall(IF_ID_Stall),
+        .flush(IF_ID_Flush),
         .PC_IF(PC_IF),
         .inst_IF(inst_IF),
         .PC_ID(PC_ID),
@@ -128,8 +140,11 @@ module MCPU(
     // ***********************ID*****************************
     CtrlUnit M_CtrlUnit (
         .inst(inst_ID),
+        .RS1Use(RS1Use),
+        .RS2Use(RS2Use),
         .BrType(BrType_ID),
-        .Jump(Jump_ID),
+        .Jal(Jal),
+        .Jalr(Jalr),
         .ImmSel(ImmSel_ID),
         .ALUSrcASel(ALUSrcASel_ID),
         .ALUSrcBSel(ALUSrcBSel_ID),
@@ -141,6 +156,8 @@ module MCPU(
         .Mem2Reg(Mem2Reg_ID)
     );
     
+    assign raddr1_ID = inst_ID[19:15];
+    assign raddr2_ID = inst_ID[24:20];
     assign waddr_ID = inst_ID[11:7];
     
     RegFile M_RegFile (
@@ -168,13 +185,31 @@ module MCPU(
         .BranchRes(BranchRes)
     );
     
-    assign DoJump = BranchRes || Jump_ID;
-    assign JumpPC = PC_ID + imm_ID;
+    wire Hazards = (RegWrite_EX && waddr_EX != 0) || (RegWrite_MEM && waddr_MEM != 0);
+    assign DataStall = (RS1Use && raddr1_ID != 0 && Hazards && (raddr1_ID == waddr_EX || raddr1_ID == waddr_MEM))
+                    || (RS2Use && raddr2_ID != 0 && Hazards && (raddr2_ID == waddr_EX || raddr2_ID == waddr_MEM));
+    wire JumpStall = BranchRes || Jal || Jalr;
+    assign PC_EN_IF = ~DataStall;
+    assign IF_ID_Flush = JumpStall;
+    assign IF_ID_Stall = DataStall;
+    assign ID_EX_Flush = DataStall;
+    
+    assign DoJump = BranchRes || Jal || Jalr;
+    
+    Mux21_32 M_Mux21_32_JumpBase (
+        .in0(PC_ID),
+        .in1(rdata1_ID),
+        .sel(Jalr),
+        .out(JumpPCBase)
+    );
+    
+    assign JumpPC = JumpPCBase + imm_ID;
     
     ID_EX M_ID_EX (
         .clk(clk),
         .rst(rst),
         .EN(ID_EX_EN),
+        .flush(ID_EX_Flush),
         // input
         .PC_ID(PC_ID),
         .inst_ID(inst_ID),

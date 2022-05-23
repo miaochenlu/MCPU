@@ -4,6 +4,7 @@ module ID_EX(
     input clk,
     input rst,
     input EN,
+    input flush,
     input [31:0] PC_ID,
     input [31:0] inst_ID,
     input [31:0] rdata1_ID,
@@ -54,20 +55,38 @@ module ID_EX(
         end
         else begin
             if(EN) begin
-                PC_EX           <= PC_ID;
-                inst_EX         <= inst_ID;
-                rdata1_EX       <= rdata1_ID;
-                rdata2_EX       <= rdata2_ID;
-                imm_EX          <= imm_ID;
-                ALUSrcASel_EX   <= ALUSrcASel_ID;
-                ALUSrcBSel_EX   <= ALUSrcBSel_ID;
-                ALUCtrl_EX      <= ALUCtrl_ID;
-                MemRW_EX        <= MemRW_ID;
-                MemRdCtrl_EX    <= MemRdCtrl_ID;
-                MemWrCtrl_EX    <= MemWrCtrl_ID;
-                RegWrite_EX     <= RegWrite_ID;
-                waddr_EX        <= waddr_ID;
-                Mem2Reg_EX      <= Mem2Reg_ID;
+                if(flush) begin
+                    PC_EX           <= PC_EX;
+                    inst_EX         <= 32'h00000000;
+                    rdata1_EX       <= 0;
+                    rdata2_EX       <= 0;
+                    imm_EX          <= 0;
+                    ALUSrcASel_EX   <= 0;
+                    ALUSrcBSel_EX   <= 0;
+                    ALUCtrl_EX      <= 0;
+                    MemRW_EX        <= 0;
+                    MemRdCtrl_EX    <= 0;
+                    MemWrCtrl_EX    <= 0;
+                    RegWrite_EX     <= 0;
+                    waddr_EX        <= 0;
+                    Mem2Reg_EX      <= 0;
+                end
+                else begin
+                    PC_EX           <= PC_ID;
+                    inst_EX         <= inst_ID;
+                    rdata1_EX       <= rdata1_ID;
+                    rdata2_EX       <= rdata2_ID;
+                    imm_EX          <= imm_ID;
+                    ALUSrcASel_EX   <= ALUSrcASel_ID;
+                    ALUSrcBSel_EX   <= ALUSrcBSel_ID;
+                    ALUCtrl_EX      <= ALUCtrl_ID;
+                    MemRW_EX        <= MemRW_ID;
+                    MemRdCtrl_EX    <= MemRdCtrl_ID;
+                    MemWrCtrl_EX    <= MemWrCtrl_ID;
+                    RegWrite_EX     <= RegWrite_ID;
+                    waddr_EX        <= waddr_ID;
+                    Mem2Reg_EX      <= Mem2Reg_ID;
+                end
             end
             else begin
                 PC_EX           <= PC_EX;

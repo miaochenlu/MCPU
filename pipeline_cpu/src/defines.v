@@ -45,3 +45,11 @@
 `define SRA   4'b1010
 `define AP4   4'b1011
 `define OUTB  4'b1100
+
+`define NOFORWARD 2'b00
+`define FORWARD_A_MEM 2'b01
+`define FORWARD_A_WB  2'b10
+`define FORWARD_B_MEM 2'b01
+`define FORWARD_B_WB  2'b10
+`define FORWARD_WRITEMEM_MEM 2'b01
+`define FORWARD_WRITEMEM_ALU 2'b10

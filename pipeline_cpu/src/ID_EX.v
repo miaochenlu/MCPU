@@ -7,6 +7,10 @@ module ID_EX(
     input flush,
     input [31:0] PC_ID,
     input [31:0] inst_ID,
+    input [ 4:0] raddr1_ID,
+    input [ 4:0] raddr2_ID,
+    input RS1Use_ID,
+    input RS2Use_ID,
     input [31:0] rdata1_ID,
     input [31:0] rdata2_ID,
     input [31:0] imm_ID,
@@ -22,6 +26,10 @@ module ID_EX(
     
     output reg [31:0] PC_EX,
     output reg [31:0] inst_EX,
+    output reg [ 4:0] raddr1_EX,
+    output reg [ 4:0] raddr2_EX,
+    output reg RS1Use_EX,
+    output reg RS2Use_EX,
     output reg [31:0] rdata1_EX,
     output reg [31:0] rdata2_EX,
     output reg [31:0] imm_EX,
@@ -40,6 +48,10 @@ module ID_EX(
         if(rst) begin
             PC_EX           <= 0;
             inst_EX         <= 0;
+            raddr1_EX       <= 0;
+            raddr2_EX       <= 0;
+            RS1Use_EX       <= 0;
+            RS2Use_EX       <= 0;
             rdata1_EX       <= 0;
             rdata2_EX       <= 0;
             imm_EX          <= 0;
@@ -56,14 +68,18 @@ module ID_EX(
         else begin
             if(EN) begin
                 if(flush) begin
-                    PC_EX           <= PC_EX;
+                    PC_EX           <= PC_ID;
                     inst_EX         <= 32'h00000000;
-                    rdata1_EX       <= 0;
-                    rdata2_EX       <= 0;
-                    imm_EX          <= 0;
-                    ALUSrcASel_EX   <= 0;
-                    ALUSrcBSel_EX   <= 0;
-                    ALUCtrl_EX      <= 0;
+//                    raddr1_EX       <= raddr1_ID;
+//                    raddr2_EX       <= raddr2_ID;
+//                    RS1Use_EX       <= RS1Use_ID;
+//                    RS2Use_EX       <= RS2Use_ID;
+//                    rdata1_EX       <= rdata1_ID;
+//                    rdata2_EX       <= rdata2_ID;
+//                    imm_EX          <= imm_ID;
+//                    ALUSrcASel_EX   <= 0;
+//                    ALUSrcBSel_EX   <= 0;
+//                    ALUCtrl_EX      <= 0;
                     MemRW_EX        <= 0;
                     MemRdCtrl_EX    <= 0;
                     MemWrCtrl_EX    <= 0;
@@ -74,6 +90,10 @@ module ID_EX(
                 else begin
                     PC_EX           <= PC_ID;
                     inst_EX         <= inst_ID;
+                    raddr1_EX       <= raddr1_ID;
+                    raddr2_EX       <= raddr2_ID;
+                    RS1Use_EX       <= RS1Use_ID;
+                    RS2Use_EX       <= RS2Use_ID;
                     rdata1_EX       <= rdata1_ID;
                     rdata2_EX       <= rdata2_ID;
                     imm_EX          <= imm_ID;
@@ -91,6 +111,10 @@ module ID_EX(
             else begin
                 PC_EX           <= PC_EX;
                 inst_EX         <= inst_EX;
+                raddr1_EX       <= raddr1_EX;
+                raddr2_EX       <= raddr2_EX;
+                RS1Use_EX       <= RS1Use_EX;
+                RS2Use_EX       <= RS2Use_EX;
                 rdata1_EX       <= rdata1_EX;
                 rdata2_EX       <= rdata2_EX;
                 imm_EX          <= imm_EX;

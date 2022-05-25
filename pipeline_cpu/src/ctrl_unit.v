@@ -122,7 +122,7 @@ module CtrlUnit(
                   | ({3{is_bltu}} & `BLTU)
                   | ({3{is_bgeu}} & `BGEU);
                   
-    assign ALUSrcASel = is_R_type | is_I_type | is_S_type; // 0 for pc; 1 for reg
+    assign ALUSrcASel = is_R_type | is_I_MEM_type | is_I_LOGIC_type | is_S_type; // 0 for pc; 1 for reg
     assign ALUSrcBSel = is_R_type; // 1 for reg; 0 for imm
     
     assign ImmSel = {3{is_I_type}} & `I_TYPE_IMM
@@ -131,7 +131,7 @@ module CtrlUnit(
                   | {3{is_J_type}} & `J_TYPE_IMM
                   | {3{is_U_type}} & `U_TYPE_IMM;
     
-    assign ALUCtrl = {4{is_add | is_addi | is_I_MEM_type | is_auipc}} & `ADD
+    assign ALUCtrl = {4{is_add | is_addi | is_I_MEM_type | is_S_type | is_auipc}} & `ADD
                    | {4{is_sub}} & `SUB
                    | {4{is_and | is_andi}} & `AND
                    | {4{is_or | is_ori}} & `OR

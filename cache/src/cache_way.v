@@ -11,6 +11,7 @@ module CacheWay # (
 (
     input clk,
     input wr_en,
+    input wr_tag_en,
     input [ADDR_WIDTH - 1:0] addr,
     input [WHOLE_DATA_WIDTH - 1:0] wr_data,
     input [TAG_BITS - 1:0] wr_tag,
@@ -21,7 +22,7 @@ module CacheWay # (
 );
 
     reg [TAG_BITS:0] TagValid[(1 << ADDR_WIDTH) - 1:0];
-    reg Dirty[(1 << ADDR_WIDTH) - 1:0];
+//    reg Dirty[(1 << ADDR_WIDTH) - 1:0];
     
     assign tag_data = TagValid[addr][0] ? TagValid[addr][TAG_BITS:1] : {TAG_BITS{0}};
     
@@ -29,13 +30,13 @@ module CacheWay # (
     initial begin
         for(i = 0; i < (1 << ADDR_WIDTH); i = i + 1) begin
             TagValid[i] <= 0;
-            Dirty[i] <= 0;
+//            Dirty[i] <= 0;
         end
     end
         
     
     always @(posedge clk) begin
-        if(wr_en) begin
+        if(wr_tag_en) begin
             TagValid[addr][0] <= 1; // valid
             TagValid[addr][TAG_BITS:1] <= wr_tag;
         end

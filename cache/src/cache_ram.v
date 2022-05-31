@@ -12,6 +12,7 @@ module CacheRAM #(
     input [DATA_WIDTH - 1:0] wr_data,
     input [DATA_BYTE_NUM - 1:0] wr_byte_en,  // byte enable
     input [ADDR_WIDTH - 1:0] rd_addr,
+    output reg write_ready,
     output reg [DATA_WIDTH - 1:0] rd_data
 );
     
@@ -28,6 +29,7 @@ module CacheRAM #(
     always @(posedge clk) begin
         // read
         rd_data <= mem[rd_addr];
+        write_ready <= 0;
         
         // write
         if(wr_en) begin
@@ -35,6 +37,7 @@ module CacheRAM #(
                 if(wr_byte_en[i])
                     mem[wr_addr][i * 8 + 7 -: 8] <= wr_data[i * 8 + 7 -: 8];
             end
+            write_ready <= 1;
         end
     end
 

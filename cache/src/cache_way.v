@@ -21,7 +21,8 @@ module CacheWay # (
     output [WHOLE_DATA_WIDTH - 1:0] rd_data,    // read data
     output valid,                               // valid data ?
     output hit,                                 // cache hit ?
-    output modify                               // data modified ?
+    output modify,                              // data modified ?
+    output write_data_ready
 );
 
     /******************** Tag & Valid & Dirty *************************/
@@ -45,12 +46,12 @@ module CacheWay # (
         end
     end
         
-    
+    // tag one cycle
     always @(posedge clk) begin
         if(wr_en) begin
             // if write tag when read miss, dirty is 0
             if(refill) begin
-                Valid[addr] <= 1; Dirty[addr] <= 0; Tag[addr]   <= in_tag;
+                Valid[addr] <= 1; Dirty[addr] <= 0; Tag[addr] <= in_tag;
             end
             /***********************************why********************************/
             else if(modify && ~hit) begin
@@ -72,10 +73,13 @@ module CacheWay # (
     wire [31:0] write_data_bank2 = wr_data[ 95:64];
     wire [31:0] write_data_bank3 = wr_data[127:96];
     
+    wire [3:0] write_ready;
+    assign write_data_ready = (|write_ready);
+    // data 2 cycles
     // 4 words per cache line
-    CacheRAM Bank0 (.clk(clk), .wr_en(write_bank0), .wr_addr(addr), .wr_data(write_data_bank0), .wr_byte_en(wr_byte_en), .rd_addr(addr), .rd_data(rd_data[31:0]));
-    CacheRAM Bank1 (.clk(clk), .wr_en(write_bank1), .wr_addr(addr), .wr_data(write_data_bank1), .wr_byte_en(wr_byte_en), .rd_addr(addr), .rd_data(rd_data[63:32]));
-    CacheRAM Bank2 (.clk(clk), .wr_en(write_bank2), .wr_addr(addr), .wr_data(write_data_bank2), .wr_byte_en(wr_byte_en), .rd_addr(addr), .rd_data(rd_data[95:64]));
-    CacheRAM Bank3 (.clk(clk), .wr_en(write_bank3), .wr_addr(addr), .wr_data(write_data_bank3), .wr_byte_en(wr_byte_en), .rd_addr(addr), .rd_data(rd_data[127:96]));
+    CacheRAM Bank0 (.clk(clk), .wr_en(write_bank0), .wr_addr(addr), .wr_data(write_data_bank0), .wr_byte_en(wr_byte_en), .rd_addr(addr), .write_ready(write_ready[0]), .rd_data(rd_data[31:0]));
+    CacheRAM Bank1 (.clk(clk), .wr_en(write_bank1), .wr_addr(addr), .wr_data(write_data_bank1), .wr_byte_en(wr_byte_en), .rd_addr(addr), .write_ready(write_ready[1]), .rd_data(rd_data[63:32]));
+    CacheRAM Bank2 (.clk(clk), .wr_en(write_bank2), .wr_addr(addr), .wr_data(write_data_bank2), .wr_byte_en(wr_byte_en), .rd_addr(addr), .write_ready(write_ready[2]), .rd_data(rd_data[95:64]));
+    CacheRAM Bank3 (.clk(clk), .wr_en(write_bank3), .wr_addr(addr), .wr_data(write_data_bank3), .wr_byte_en(wr_byte_en), .rd_addr(addr), .write_ready(write_ready[3]), .rd_data(rd_data[127:96]));
     
 endmodule

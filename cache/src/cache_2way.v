@@ -27,7 +27,8 @@ module Cache2Way # (
     output [TAG_BITS - 1:0]         out_tag_way0,
     output [TAG_BITS - 1:0]         out_tag_way1,
     output [WHOLE_DATA_WIDTH - 1:0] rd_data_way0,
-    output [WHOLE_DATA_WIDTH - 1:0] rd_data_way1
+    output [WHOLE_DATA_WIDTH - 1:0] rd_data_way1,
+    output [CACHE_WAY_NUM - 1:0]    write_data_ready
 );  
 
     CacheWay M_Cache_way0 (
@@ -43,7 +44,8 @@ module Cache2Way # (
         .rd_data    (rd_data_way0),
         .valid      (valid[0]),
         .hit        (hit[0]),
-        .modify     (modify[0])
+        .modify     (modify[0]),
+        .write_data_ready(write_data_ready[0])
     );
     
     CacheWay M_Cache_way1 (
@@ -59,7 +61,8 @@ module Cache2Way # (
         .rd_data    (rd_data_way1),
         .valid      (valid[1]),
         .hit        (hit[1]),
-        .modify     (modify[1])
+        .modify     (modify[1]),
+        .write_data_ready(write_data_ready[1])
     );
     
 endmodule

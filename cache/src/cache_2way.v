@@ -13,44 +13,53 @@ module Cache2Way # (
 (
     input clk,
     input wr_en,
-    input wr_tag_en,
-    input [ADDR_WIDTH - 1:0] addr,
-    input [CACHE_WAY_NUM - 1:0] way_select,
-    input [WHOLE_DATA_WIDTH - 1:0] wr_data,
-    input [TAG_BITS - 1:0] wr_tag,
-    input [DATA_WORD_NUM - 1:0] wr_word_en,
-    input [DATA_BYTE_NUM - 1:0] wr_byte_en,  // byte enable
-    // verilog does not support 2d array as ports
-    output [TAG_BITS - 1:0] tag_data_way0,
-    output [TAG_BITS - 1:0] tag_data_way1,
+    input refill,
+    input [ADDR_WIDTH - 1:0]        addr,
+    input [TAG_BITS - 1:0]          in_tag,
+    input [CACHE_WAY_NUM - 1:0]     way_select,
+    input [WHOLE_DATA_WIDTH - 1:0]  wr_data,
+    input [DATA_WORD_NUM - 1:0]     wr_word_en,
+    input [DATA_BYTE_NUM - 1:0]     wr_byte_en,
+
+    output [CACHE_WAY_NUM - 1:0]    valid,
+    output [CACHE_WAY_NUM - 1:0]    hit,
+    output [CACHE_WAY_NUM - 1:0]    modify,
+    output [TAG_BITS - 1:0]         out_tag_way0,
+    output [TAG_BITS - 1:0]         out_tag_way1,
     output [WHOLE_DATA_WIDTH - 1:0] rd_data_way0,
     output [WHOLE_DATA_WIDTH - 1:0] rd_data_way1
 );  
 
     CacheWay M_Cache_way0 (
-        .clk(clk),
-        .wr_en(wr_en & way_select[0]),
-        .wr_tag_en(wr_tag_en & way_select[0]), 
-        .addr(addr),
-        .wr_data(wr_data),
-        .wr_tag(wr_tag),
-        .wr_word_en(wr_word_en),
-        .wr_byte_en(wr_byte_en),
-        .tag_data(tag_data_way0),
-        .rd_data(rd_data_way0)
+        .clk        (clk),
+        .wr_en      (wr_en & way_select[0]),
+        .refill     (refill),
+        .addr       (addr),
+        .in_tag     (in_tag),
+        .wr_data    (wr_data),
+        .wr_word_en (wr_word_en),
+        .wr_byte_en (wr_byte_en),
+        .out_tag    (out_tag_way0),
+        .rd_data    (rd_data_way0),
+        .valid      (valid[0]),
+        .hit        (hit[0]),
+        .modify     (modify[0])
     );
     
     CacheWay M_Cache_way1 (
-        .clk(clk),
-        .wr_en(wr_en & way_select[1]),
-        .wr_tag_en(wr_tag_en & way_select[1]), 
-        .addr(addr),
-        .wr_data(wr_data),
-        .wr_tag(wr_tag),
-        .wr_word_en(wr_word_en),
-        .wr_byte_en(wr_byte_en),
-        .tag_data(tag_data_way1),
-        .rd_data(rd_data_way1)
+        .clk        (clk),
+        .wr_en      (wr_en & way_select[1]),
+        .refill     (refill),
+        .addr       (addr),
+        .in_tag     (in_tag),
+        .wr_data    (wr_data),
+        .wr_word_en (wr_word_en),
+        .wr_byte_en (wr_byte_en),
+        .out_tag    (out_tag_way1),
+        .rd_data    (rd_data_way1),
+        .valid      (valid[1]),
+        .hit        (hit[1]),
+        .modify     (modify[1])
     );
     
 endmodule

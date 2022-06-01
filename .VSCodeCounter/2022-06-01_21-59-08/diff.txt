@@ -1,0 +1,39 @@
+Date : 2022-06-01 21:59:08
+Directory : c:\Users\Dell 7080\Desktop\Coding\MCPU
+Total : 12 files,  229 codes, -248 comments, 1 blanks, all -18 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Verilog  |         12 |        229 |       -248 |          1 |        -18 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                    | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                       |         12 |        229 |       -248 |          1 |        -18 |
+| cache                                                                   |         12 |        229 |       -248 |          1 |        -18 |
+| cache\sim                                                               |          4 |         86 |          5 |         10 |        101 |
+| cache\src                                                               |          8 |        143 |       -253 |         -9 |       -119 |
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                | language | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\sim\cache_2way_tb.v        | Verilog  |         15 |          0 |         -1 |         14 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\sim\cache_way_tb.v         | Verilog  |        -41 |          0 |         -8 |        -49 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\sim\mem_hier_tb.v          | Verilog  |         75 |          0 |         13 |         88 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\sim\memory_tb.v            | Verilog  |         37 |          5 |          6 |         48 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\cache_2way.v           | Verilog  |          6 |          0 |          0 |          6 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\cache_controller.v     | Verilog  |        305 |       -241 |         14 |         78 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\cache_controller_tmp.v | Verilog  |       -293 |        -12 |        -38 |       -343 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\cache_ram.v            | Verilog  |         10 |          0 |         -1 |          9 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\cache_way.v            | Verilog  |         16 |          0 |          3 |         19 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\defines.vh             | Verilog  |          9 |          0 |          2 |         11 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\mem_hier.v             | Verilog  |         55 |          0 |          5 |         60 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\memory.v               | Verilog  |         35 |          0 |          6 |         41 |
+| Total                                                                   |          |        229 |       -248 |          1 |        -18 |
++-------------------------------------------------------------------------+----------+------------+------------+------------+------------+

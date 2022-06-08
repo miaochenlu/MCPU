@@ -1,5 +1,8 @@
 `timescale 1ns / 1ps
 
+// https://github.com/XOR-op/TransistorU
+
+// ! the index should start with 1
 module ReorderBuffer #(
     parameter integer ROB_ROB_ENTRY_NUM = 256,
     parameter integer ROB_ENTRY_WIDTH = 8
@@ -7,39 +10,46 @@ module ReorderBuffer #(
 (
     input clk,
     input rst,
-    
+    output full,
+    output empty,
     // decode read
     input read_en1,
-    input [ROB_ENTRY_WIDTH - 1:0] ROB_raddr1,
+    input [ROB_ENTRY_WIDTH - 1:0] ROB_rindex1,
     output reg [31:0] ROB_rdata1,
     output reg ready1,
 
     input read_en2,
-    input [ROB_ENTRY_WIDTH - 1:0] ROB_raddr2,
+    input [ROB_ENTRY_WIDTH - 1:0] ROB_rindex2,
     output reg [31:0] ROB_rdata2,
     output reg ready2,
     
     // decode write
     input write_en,
     input [4:0] waddr,
-    input [31:0] wpc,
-    input [31:0] winst,
-    output queue_full,
-    output reg [ROB_ENTRY_NUM - 1:0] ROB_waddr,
+    input [31:0] pc_in,
+    input [31:0] inst_in,
+    output [ROB_ENTRY_NUM - 1:0] ROB_windex,
+
+    // commit to registers
+    output reg ROB_we,
+    output reg [ 4:0] addr_commit,
+    output reg [31:0] data_commit,
+    output reg [ROB_ENTRY_WIDTH - 1:0] ROB_index_commit,
 );
-    reg Valid[ROB_ENTRY_NUM - 1:0];
+    reg        Valid[ROB_ENTRY_NUM - 1:0];
+    reg        Ready[ROB_ENTRY_NUM - 1:0];
     reg [31:0] Inst[ROB_ENTRY_NUM - 1:0];
     reg [31:0] PC_Inst[ROB_ENTRY_NUM - 1:0];
-    reg Ready[ROB_ENTRY_NUM - 1:0];
     reg [ 4:0] DestRegID[ROB_ENTRY_NUM - 1:0];
     reg [31:0] DestRegVal[ROB_ENTRY_NUM - 1:0];
 
     reg [ROB_ENTRY_WIDTH - 1:0] head, tail;  // pointer to the head and tail of the fifo queue
     reg [ROB_ENTRY_WIDTH - 1:0] counter;     // count the number of elements in the ROB, to see if it's empty or full
 
-    wire queue_full;
-    assign queue_full = (counter >= ROB_ROB_ENTRY_NUM);
-
+    assign empty = (counter == 0);
+    assign full  = (counter >= ROB_ROB_ENTRY_NUM);
+    assign ROB_windex = tail;
+    
     integer i;
     initial begin
         for(i = 0; i < ROB_ENTRY_NUM; i = i + 1) begin
@@ -53,37 +63,60 @@ module ReorderBuffer #(
         head = 0;
         tail = 0;
         counter = 0;
+
+        ROB_we     <= 1'd0;
     end
 
-    // decode read
-    always @(*) begin
-        ready1 = 0;
-        ready2 = 0;
+    /*****************************decode read****************************/
+    assign ready1     = (read_en1 && Valid[ROB_rindex1]) ? Ready[ROB_rindex1] : 1'd0;
+    assign ready2     = (read_en2 && Valid[ROB_rindex2]) ? Ready[ROB_rindex2] : 1'd0;
+    assign ROB_rdata1 = (read_en1 && Valid[ROB_rindex1]) ? DestRegVal[ROB_rindex1] : 32'd0;
+    assign ROB_rdata2 = (read_en2 && Valid[ROB_rindex2]) ? DestRegVal[ROB_rindex2] : 32'd0;
 
-        if(read_en1 && Valid[ROB_raddr1]) begin
-            ready1 = Ready[ROB_raddr1];
-            ROB_rdata1 = DestRegID[ROB_raddr1];
-        end
-
-        if(read_en2 && Valid[ROB_raddr2]) begin
-            ready2 = Ready[ROB_raddr2];
-            ROB_rdata2 = DestRegID[ROB_raddr2];
-        end
-    end
-
-    // decode write
     always @(posedge clk) begin
-        if(write_en && ~queue_full) begin
-            ROB_waddr        <= tail;
+        if(rst) begin
+            for(i = 0; i < ROB_ENTRY_NUM; i = i + 1) begin
+                Valid[i]      <= 0;
+                Inst[i]       <= 0;
+                PC_Inst[i]    <= 0;
+                Ready[i]      <= 0;
+                DestRegID[i]  <= 0;
+                DestRegVal[i] <= 0;
+            end
+            head <= 0;
+            tail <= 0;
+            counter <= 0;
+
+            // output set to 0
+            ROB_we     <= 1'd0;
+
+        end
+    /*****************************decode write****************************/
+        if(write_en && ~full) begin
             Valid[tail]      <= 1'd1;
-            Inst[tail]       <= winst;
-            PC_Inst[tail]    <= wpc;
+            Inst[tail]       <= inst_in;
+            PC_Inst[tail]    <= pc_in;
             Ready[tail]      <= 1'd0;
             DestRegID[tail]  <= waddr;
             DestRegVal[tail] <= 32'd0;
 
-            tail <= tail + 1;
+            tail <= (tail == ROB_ENTRY_NUM) ? 0 : tail + 1;
             counter <= counter + 1;
+        end
+    /*****************************commit****************************/
+        if(~empty && (Ready[head])) begin
+            ROB_we      <= 1'd1;
+            addr_commit <= DestRegID[head];
+            data_commit <= DestRegVal[head];
+            ROB_index_commit <= head;
+
+            head        <= (head == ROB_ENTRY_NUM) ? 0 : head + 1;
+            counter     <= counter - 1;
+            Valid[head] <= 1'd0;
+            Ready[head] <= 1'd0;
+        end
+        else begin
+            ROB_we <= 1'd0;
         end
     end
 

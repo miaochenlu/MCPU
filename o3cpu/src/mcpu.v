@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-
+`include "defines.vh"
 // https://github.com/Ting0325/ICLAB_project/tree/master/src
 // https://github.com/XOR-op/TransistorU
 module MCPU (
@@ -40,80 +40,76 @@ module MCPU (
         .out(NextPC)
     );
 
-    IF_IS M_IF_IS (
+    IF_IS M_IF_ID (
         .clk(clk),
         .rst(rst),
-        .EN(IF_IS_EN),
-        .stall(IF_IS_Stall),
-        .flush(IF_IS_Flush),
+        .EN(IF_ID_EN),
+        .stall(IF_ID_Stall),
+        .flush(IF_ID_Flush),
         .PC_IF(PC_IF),
         .inst_IF(inst_IF),
-        .PC_IS(PC_IS),
-        .inst_IS(inst_IS)
+        .PC_ID(PC_ID),
+        .inst_ID(inst_ID)
     );
 
-    /**********************issue*********************/
+    /**********************decode*********************/
 
-    wire [3:0] FUType_IS;
-    wire RS1Use_IS, RS2Use_IS;
-    wire RegWrite_IS;
-    wire [2:0] ImmSel_IS;
-    wire ALUSrcASel_IS, ALUSrcBSel_IS;
-    wire [3:0] ALUCtrl_IS;
-    wire [2:0] MemRdCtrl_IS;
-    wire [1:0] MemWrCtrl_IS;
-    wire MemRW_IS;
-    wire [2:0] BrType_IS;
+    wire [3:0] FUType_ID;
+    wire RS1Use_ID, RS2Use_ID;
+    wire RegWrite_ID;
+    wire [2:0] ImmSel_ID;
+    wire ALUSrcASel_ID, ALUSrcBSel_ID;
+    wire [3:0] ALUCtrl_ID;
+    wire [2:0] MemRdCtrl_ID;
+    wire [1:0] MemWrCtrl_ID;
+    wire MemRW_ID;
+    wire [2:0] BrType_ID;
     wire Jalr;
     wire Jal;
 
-    wire [31:0] imm_IS;
+    wire [31:0] imm_ID;
 
     wire valid1;
     wire [31:0] RAT_rdata1;
-    wire [ROB_ENTRY_WIDTH - 1:0] ROB_index1_out;
+    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_index1_out;
     wire valid2;
     wire [31:0] RAT_rdata2;
-    wire [ROB_ENTRY_WIDTH - 1:0] ROB_index2_out;
+    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_index2_out;
 
     wire full, empty;
     wire [31:0] ROB_rdata1;
     wire ready1;
     wire [31:0] ROB_rdata2;
     wire ready2;
-    wire [ROB_ENTRY_NUM - 1:0] ROB_windex;
+    wire [`ROB_ENTRY_NUM - 1:0] ROB_windex;
     wire ROB_we;
     wire [ 4:0] ROB_addr_commit;
     wire [31:0] ROB_data_commit;
-    wire [ROB_ENTRY_WIDTH - 1:0] ROB_index_commit;
+    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_index_commit;
 
     Decoder M_Decoder (
-        .inst(inst_IS),
-        .FUType(FUType_IS),
-        .RS1Use(RS1Use_IS),
-        .RS2Use(RS2Use_IS),
-        .RegWrite(RegWrite_IS),
-        .ImmSel(ImmSel_IS),
-        .ALUSrcASel(ALUSrcASel_IS),
-        .ALUSrcBSel(ALUSrcBSel_IS),
-        .ALUCtrl(ALUCtrl_IS),
-        .MemRdCtrl(MemRdCtrl_IS),
-        .MemWrCtrl(MemWrCtrl_IS),
-        .MemRW(MemRW_IS),
-        .BrType(BrType_IS),
+        .inst(inst_ID),
+        .FUType(FUType_ID),
+        .RS1Use(RS1Use_ID),
+        .RS2Use(RS2Use_ID),
+        .RegWrite(RegWrite_ID),
+        .ImmSel(ImmSel_ID),
+        .ALUSrcASel(ALUSrcASel_ID),
+        .ALUSrcBSel(ALUSrcBSel_ID),
+        .ALUCtrl(ALUCtrl_ID),
+        .MemRdCtrl(MemRdCtrl_ID),
+        .MemWrCtrl(MemWrCtrl_ID),
+        .MemRW(MemRW_ID),
+        .BrType(BrType_ID),
         .Jalr(Jalr),
         .Jal(Jal)
     );
 
-    assign is_branch = (FUType_ID == FU_BRA);
-    assign branch_valid = is_branch & ;
+    ID_DP M_ID_DP (
 
-    ImmGen M_ImmGen (
-        .inst(inst_IS),
-        .ImmSel(ImmSel_IS),
-        .imm(imm_IS)
     );
 
+    /**********************RENAMING*********************/
     RAT M_RAT (
         .clk(clk),
         .rst(rst),
@@ -127,9 +123,9 @@ module MCPU (
         .valid2(valid2),
         .rdata2(RAT_rdata2),
         .ROB_index2_out(ROB_index2_out),
-        // decode set dest reg
-        .dec_we(RegWrite),
-        .waddr(inst_IS[11:7]),
+        // register renaming  decode set dest reg
+        .dec_we(RegWrite_DP),
+        .waddr(inst_DP[11:7]),
         .ROB_index_in(ROB_windex),
         // ROB commit
         .ROB_we(ROB_we),
@@ -143,20 +139,20 @@ module MCPU (
         .rst(rst),
         .full(full),
         .empty(empty),
-        .read_en1(RS1Use & ~valid1),
+        .read_en1(RS1Use_IS),
         .ROB_rindex1(ROB_rindex1),
         .ROB_rdata1(ROB_rdata1),
         .ready1(ready1),
 
-        .read_en2(RS2Use & ~valid2),
+        .read_en2(RS2Use_IS),
         .ROB_raddr2(ROB_rindex2),
         .ROB_rdata2(ROB_rdata2),
         .ready2(ready2),
-
-        .write_en(RegWrite_IS),
-        .waddr(inst_IS[11:7]),
-        .pc_in(PC_IS),
-        .inst_in(inst_IS),
+        // register renaming
+        .write_en(RegWrite_DP),
+        .waddr(inst_DP[11:7]),
+        .pc_in(PC_DP),
+        .inst_in(inst_DP),
         .ROB_windex(ROB_windex),
 
         .ROB_we(ROB_we),
@@ -165,12 +161,93 @@ module MCPU (
         .ROB_index_commit(ROB_index_commit)
     );
 
-    wire [31:0] rdata1, rdata2;
+
+/**********************DISPATCH*******************/
+    
+    // choose the function unit
+    RSManager M_RSManager (
+        .FUType(FUType_IS),
+        .RSALU_we(RSALU_we),
+        .RSBRA_we(RSBRA_we),
+        .RSLSQ_we(RSLSQ_we)
+    );
+
+    ImmGen M_ImmGen (
+        .inst(inst_DP),
+        .ImmSel(ImmSel_DP),
+        .imm(imm_DP)
+    );
+
+    // read operands from Regfile & ROB
+    OperandAManager M_OperandAManager (
+        .SrcASel(SrcASel_DP),
+        .PC(PC_DP),
+        .RAT_valid(RAT_valid1),
+        .RAT_value(RAT_rdata1),
+        .ROB_ready(ROB_ready1),
+        .ROB_index_in(ROB_rindex1),
+        .ROB_value(ROB_rdata1),
+        .OpAValue(OpAValue),
+        .ROB_index_out(OpA_ROB_index)
+    );
+
+    OperandBManager M_OperandBManager (
+        .SrcBSel(SrcBSel_DP),
+        .imm(imm_DP),
+        .RAT_valid(RAT_valid2),
+        .RAT_value(RAT_rdata2),
+        .ROB_ready(ROB_ready2),
+        .ROB_index_in(ROB_rindex2),
+        .ROB_value(ROB_rdata2),
+        .OpBValue(OpBValue),
+        .ROB_index_out(OpB_ROB_index)
+    );
 
 
-/**********************execute*******************/
+    // write to RS
+    RSALU M_RSALU (
+        .clk(clk),
+        .rst(rst),
+        .full(RSALU_full),
 
+        .issue_we(RSALU_we),
+        .Op_in(ALUCtrl_DP),
+        .Vj_in(OpAValue),
+        .Vk_in(OpBValue),
+        .Qj_in(OpA_ROB_index),
+        .Qk_in(OpB_ROB_index),
+        .Dest_in(Dest_in),
+        
+        .Op_out(RS_ALUOp),
+        .Vj_out(ALUSrcA),
+        .Vk_out(ALUSrcB),
+        .Dest_out(ALUDest)
+    );
+
+/**********************Execute*******************/
+
+    ALU M_ALU (
+        .ALUOp(RS_ALUOp),
+        .ALUSrcA(ALUSrcA),
+        .ALUSrcB(ALUSrcB),
+        .Dest_in(ALUDest_in),
+        .busy(ALU_busy),
+        .res(ALU_res),
+        .Dest_out(ALUDest_out),
+        .zero(),
+        .overflow()
+    );
+
+    CDB M_CDB (
+        .ALURes_ready(ALURes_ready),
+        .ALUData_in(ALU_res),
+        .ALUDest_in(ALUDest_out),
+        .ALURes_rec(),
+        .ALUData_out(CDB_ALUData_out),
+        .ALUDest_out(CDB_ALUDest_out)
+    );
 /*******************write result*****************/
+
 
 /********************inst commit*****************/
 

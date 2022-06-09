@@ -5,25 +5,23 @@ module Decoder(
     input [31:0] inst,
     // which fuction unit
     output [2:0] FUType,
-    output RS1Use,
-    output RS2Use,
-    output RegWrite,
+    output       RS1Use,
+    output       RS2Use,
+    output       RegWrite,
     output [3:0] ImmSel,
-    output ALUSrcASel,
-    output ALUSrcBSel,
+    output       ALUSrcASel,
+    output       ALUSrcBSel,
 
     // ALU function unit
     output [3:0] ALUCtrl,
 
     // load store function unit
-    output [2:0] MemRdCtrl,
-    output [1:0] MemWrCtrl,
-    output MemRW,
+    output [3:0] MemCtrl,
 
     // branch unit
     output [2:0] BrType,
-    output Jalr,
-    output Jal,
+    output       Jalr,
+    output       Jal
 );
  
     wire    [6:0]   opcode;
@@ -135,15 +133,14 @@ module Decoder(
                    | {4{is_jal | is_jalr}} & `AP4
                    | {4{is_lui}} & `OUTB;
 
-    assign MemRW = is_S_type;
-    assign MemRdCtrl = ({3{is_lb}}  & `LB)
-                     | ({3{is_lbu}} & `LBU)
-                     | ({3{is_lh}}  & `LH)
-                     | ({3{is_lhu}} & `LHU)
-                     | ({3{is_lw}}  & `LW);
-    assign MemWrCtrl = ({3{is_sb}} & `SB)
-                     | ({3{is_sh}} & `SH)
-                     | ({3{is_sw}} & `SW);                  
+    assign MemCtrl = ({4{is_lb}}  & `LB)
+                   | ({4{is_lbu}} & `LBU)
+                   | ({4{is_lh}}  & `LH)
+                   | ({4{is_lhu}} & `LHU)
+                   | ({4{is_lw}}  & `LW)
+                   | ({4{is_sb}}  & `SB)
+                   | ({4{is_sh}}  & `SH)
+                   | ({4{is_sw}}  & `SW);                  
     
     
     assign BrType = ({3{is_beq}}  & `BEQ)

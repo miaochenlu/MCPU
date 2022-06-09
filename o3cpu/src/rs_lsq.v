@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 `include "defines.vh"
 
-module RSALU (
+module RSLSQ (
     input clk,
     input rst,
     output full,
@@ -12,7 +12,6 @@ module RSALU (
     input [31:0] Vj_in,
     input [31:0] Vk_in,
     input [`ROB_ENTRY_WIDTH - 1:0] Qj_in,
-    input [`ROB_ENTRY_WIDTH - 1:0] Qk_in,
     input [`ROB_ENTRY_WIDTH - 1:0] Dest_in,
 
     // CDB write result

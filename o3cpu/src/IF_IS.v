@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module IF_IS(
+module IF_ID(
     input clk,
     input rst,
     input EN,
@@ -9,32 +9,32 @@ module IF_IS(
     input [31:0] PC_IF,
     input [31:0] inst_IF,
     
-    output reg [31:0] PC_IS,
-    output reg [31:0] inst_IS
+    output reg [31:0] PC_ID,
+    output reg [31:0] inst_ID
 );
 
     always @(posedge clk) begin
         if(rst) begin
-            PC_IS <= 0;
-            inst_IS <= 0;
+            PC_ID <= 0;
+            inst_ID <= 0;
         end
         else if(EN) begin
             if(stall) begin
-                PC_IS   <= PC_IS;
-                inst_IS <= inst_IS;
+                PC_ID   <= PC_ID;
+                inst_ID <= inst_ID;
             end
             else if(flush) begin
-                PC_IS   <= PC_IS;
-                inst_IS <= 32'h00002003; // nop lw zero, 0(zero)
+                PC_ID   <= PC_ID;
+                inst_ID <= 32'h00002003; // nop lw zero, 0(zero)
             end
             else begin
-                PC_IS   <= PC_IF;
-                inst_IS <= inst_IF;
+                PC_ID   <= PC_IF;
+                inst_ID <= inst_IF;
             end
         end
         else begin
-            PC_IS   <= PC_IS;
-            inst_IS <= inst_IS;
+            PC_ID   <= PC_ID;
+            inst_ID <= inst_ID;
         end
     end
     

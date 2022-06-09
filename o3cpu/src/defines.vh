@@ -1,5 +1,17 @@
 `timescale 1ns / 1ps
 
+`define RSALU_ENTRY_NUM 2
+`define RSALU_ENTRY_WIDTH 1
+`define ALU_OP_WIDTH 4
+
+`define RSLSQ_ENTRY_NUM 4
+`define RSLSQ_ENTRY_WIDTH 2
+`define LSQ_OP_WIDTH 4
+
+`define ROB_ENTRY_NUM 255
+`define ROB_ENTRY_WIDTH 8
+
+
 `define FU_EMP 3'd0 // empty
 `define FU_ALU 3'd1 // integer ALU
 `define FU_LSQ 3'd2 // load/store unit
@@ -15,28 +27,27 @@
 `define U_AUIPC_OP 7'b0010111
 `define J_OP       7'b1101111
 
-`define LB   3'b001
-`define LBU  3'b010
-`define LH   3'b011
-`define LHU  3'b100
-`define LW   3'b101
-
-`define SB  2'b01
-`define SH  2'b10
-`define SW  2'b11
-
-`define BEQ  3'b010
-`define BNE  3'b011
-`define BLT  3'b100
-`define BGE  3'b101
-`define BLTU  3'b110
-`define BGEU  3'b111
-
 `define I_TYPE_IMM  3'b001
 `define S_TYPE_IMM  3'b010
 `define B_TYPE_IMM  3'b011
 `define J_TYPE_IMM  3'b100
 `define U_TYPE_IMM  3'b101
+
+`define LB   4'b0001
+`define LBU  4'b0010
+`define LH   4'b0011
+`define LHU  4'b0100
+`define LW   4'b0101
+`define SB   4'b1001
+`define SH   4'b1010
+`define SW   4'b1011
+
+`define BEQ   3'b010
+`define BNE   3'b011
+`define BLT   3'b100
+`define BGE   3'b101
+`define BLTU  3'b110
+`define BGEU  3'b111
 
 `define ADD   4'b0001
 `define SUB   4'b0010
@@ -50,11 +61,3 @@
 `define SRA   4'b1010
 `define AP4   4'b1011
 `define OUTB  4'b1100
-
-`define NOFORWARD 2'b00
-`define FORWARD_A_MEM 2'b01
-`define FORWARD_A_WB  2'b10
-`define FORWARD_B_MEM 2'b01
-`define FORWARD_B_WB  2'b10
-`define FORWARD_WRITEMEM_MEM 2'b01
-`define FORWARD_WRITEMEM_ALU 2'b10

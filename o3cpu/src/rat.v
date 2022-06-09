@@ -21,14 +21,14 @@ module RAT #(
     
     // set dst reg
     input  dec_we, // set rob entry
-    input  [4:0] waddr;
-    input  [ROB_ENTRY_WIDTH - 1:0] ROB_index_in;
+    input  [4:0] waddr,
+    input  [ROB_ENTRY_WIDTH - 1:0] ROB_index_in,
 
     // ROB commits to regfile
     input  ROB_we,
     input  [ 4:0] ROB_addr_commit,
     input  [31:0] ROB_data_commit,
-    input  [ROB_ENTRY_WIDTH - 1:0] ROB_index_commit;    // to see if it's the latest
+    input  [ROB_ENTRY_WIDTH - 1:0] ROB_index_commit    // to see if it's the latest
 );
     // if the reg value is valid
     reg Valid[31:0];

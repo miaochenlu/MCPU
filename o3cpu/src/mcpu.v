@@ -218,16 +218,38 @@ module MCPU (
         .Qk_in(OpB_ROB_index),
         .Dest_in(Dest_in),
         
-        .Op_out(RS_ALUOp),
+        .Op_out(RSALU_Op),
         .Vj_out(ALUSrcA),
         .Vk_out(ALUSrcB),
         .Dest_out(ALUDest)
     );
 
+    RSLSQ M_RSLSQ (
+        .clk(clk),
+        .rst(rst),
+        .full(RSLSQ_full),
+        
+        .issue_we(RSLSQ_we),
+        .Op_in(MemCtrl_DP),
+        .Vj_in(OpAValue),
+        .Vk_in(imm_DP),
+        .Qj_in(OpA_ROB_index),
+        .Dest_in(Dest_in),
+
+        .Op_out(RSLSQ_Op)
+        // for load
+        .Addr_out(RSLSQ_Addr),
+        //for store
+
+
+        .rd_ready(rd_ready),
+        .wr_ready(wr_ready)
+    );
+
 /**********************Execute*******************/
 
     ALU M_ALU (
-        .ALUOp(RS_ALUOp),
+        .ALUOp(RSALU_Op),
         .ALUSrcA(ALUSrcA),
         .ALUSrcB(ALUSrcB),
         .Dest_in(ALUDest_in),
@@ -236,6 +258,18 @@ module MCPU (
         .Dest_out(ALUDest_out),
         .zero(),
         .overflow()
+    );
+
+
+    RAM M_RAM (
+        .clk(~clk),
+        .mem_ctrl(MemCtrl),
+        .wr_addr(mem_addr),
+        .wr_data(MemWriteData_MEM),
+        .rd_addr(mem_addr),
+        .rd_ready(),
+        .wr_ready(),
+        .rd_data(MemRdData_MEM)
     );
 
     CDB M_CDB (

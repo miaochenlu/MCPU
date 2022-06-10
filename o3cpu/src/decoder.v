@@ -87,7 +87,7 @@ module Decoder(
     
 /*------------------------------------------------------------------------------------*/    
     wire is_R_type = is_add | is_sub | is_sll | is_slt | is_sltu | is_xor
-                     | is_srl | is_sra | is_or | is_and ;
+                   | is_srl | is_sra | is_or | is_and ;
     wire is_I_type = is_lb | is_lh | is_lw | is_lbu | is_lhu
                       | is_addi | is_slti | is_sltiu | is_xori | is_ori | is_andi
                       | is_slli | is_srli | is_srai

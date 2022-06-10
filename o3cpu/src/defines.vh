@@ -4,7 +4,7 @@
 `define RSALU_ENTRY_WIDTH 1
 `define ALU_OP_WIDTH 4
 
-`define RSLSQ_ENTRY_NUM 4
+`define RSLSQ_ENTRY_NUM 3
 `define RSLSQ_ENTRY_WIDTH 2
 `define LSQ_OP_WIDTH 4
 

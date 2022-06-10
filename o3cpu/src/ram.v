@@ -1,14 +1,14 @@
 `timescale 1ns / 1ps
-`include "defines.v"
+`include "defines.vh"
 
 module RAM (
     input clk,
-    input wr_en,
-    input [1:0] wr_ctrl,
-    input [2:0] rd_ctrl,
+    input [3:0] mem_ctrl,
     input [31:0] wr_addr,
     input [31:0] wr_data,
     input [31:0] rd_addr,
+    output reg rd_ready,
+    output reg wr_ready,
     output reg [31:0] rd_data
 );
             
@@ -19,9 +19,10 @@ module RAM (
     end
     
     always @(*) begin
+        rd_ready = 1'd1;
         if(rd_addr[31:7]) rd_data = 0;
         else begin
-            case(rd_ctrl)
+            case(mem_ctrl)
                 `LB:  rd_data = {{24{mem[rd_addr[6:0]][7]}}, mem[rd_addr[6:0]]}; //sign extension
                 `LBU: rd_data = {24'b0, mem[rd_addr[6:0]]};
                 `LH:  rd_data = {{16{mem[rd_addr[6:0] + 1]}}, mem[rd_addr[6:0] + 1], mem[rd_addr[6:0]]};
@@ -33,8 +34,9 @@ module RAM (
     end
     
     always @(posedge clk) begin
-        if(wr_en & ~|wr_addr[31:7]) begin
-            case(wr_ctrl)
+        wr_ready <= 1'd0;
+        if((mem_ctrl && 4'b1000) & ~|wr_addr[31:7]) begin
+            case(mem_ctrl)
                 `SB: mem[wr_addr[6:0]] <= wr_data[7:0];
                 `SH: begin
                         mem[wr_addr[6:0] + 1] <= wr_data[15:8];
@@ -48,6 +50,7 @@ module RAM (
                     end
                 default: mem[wr_addr[6:0]] <= mem[wr_addr[6:0]];
             endcase
+            wr_ready <= 1'd1;
         end
     end
 endmodule

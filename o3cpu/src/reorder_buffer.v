@@ -11,7 +11,7 @@ module ReorderBuffer (
     input read_en1,
     input [`ROB_ENTRY_WIDTH - 1:0] ROB_rindex1,
     output reg [31:0] ROB_rdata1,
-    output reg ready1,
+    output ready1,
 
     input read_en2,
     input [`ROB_ENTRY_WIDTH - 1:0] ROB_rindex2,

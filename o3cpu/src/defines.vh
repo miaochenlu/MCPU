@@ -4,6 +4,10 @@
 `define RSALU_ENTRY_WIDTH 2 
 `define ALU_OP_WIDTH 4
 
+`define RSBRA_ENTRY_NUM 3
+`define RSBRA_ENTRY_WIDTH 2
+`define BRA_OP_WIDTH 4
+
 `define RSLSQ_ENTRY_NUM 3
 `define RSLSQ_ENTRY_WIDTH 2
 `define LSQ_OP_WIDTH 4
@@ -42,12 +46,14 @@
 `define SH   4'b1010
 `define SW   4'b1011
 
-`define BEQ   3'b010
-`define BNE   3'b011
-`define BLT   3'b100
-`define BGE   3'b101
-`define BLTU  3'b110
-`define BGEU  3'b111
+`define BEQ   4'b0010
+`define BNE   4'b0011
+`define BLT   4'b0100
+`define BGE   4'b0101
+`define BLTU  4'b0110
+`define BGEU  4'b0111
+`define JAL   4'b1001
+`define JALR  4'b1010
 
 `define ADD   4'b0001
 `define SUB   4'b0010

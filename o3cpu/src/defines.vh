@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
-`define RSALU_ENTRY_NUM 2
-`define RSALU_ENTRY_WIDTH 1
+`define RSALU_ENTRY_NUM 3
+`define RSALU_ENTRY_WIDTH 2 
 `define ALU_OP_WIDTH 4
 
 `define RSLSQ_ENTRY_NUM 3

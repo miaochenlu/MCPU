@@ -16,10 +16,10 @@ module ALU (
 
 
     always @(*) begin
-        busy = (ALUCtrl == 0) ? 1'd0 : 1'd1;
+        busy = (ALUOp == 0) ? 1'd0 : 1'd1;
         Dest_out = Dest_in;
 
-        case(ALUCtrl)
+        case(ALUOp)
             `ADD:  res = ALUSrcA + ALUSrcB;
             `SUB:  res = ALUSrcA - ALUSrcB;
             `AND:  res = ALUSrcA & ALUSrcB;
@@ -42,8 +42,8 @@ module ALU (
                         |(~ALUSrcA[31] & ~ALUSrcB[31] &  res[31]);
     assign subOverflow = (~ALUSrcA[31] &  ALUSrcB[31] &  res[31])
                         |( ALUSrcA[31] & ~ALUSrcB[31] & ~res[31]);
-    assign overflow = ((ALUCtrl == `ADD | ALUCtrl == `AP4) & addOverflow)
-                     |((ALUCtrl == `SUB) & subOverflow);
+    assign overflow = ((ALUOp == `ADD | ALUOp == `AP4) & addOverflow)
+                     |((ALUOp == `SUB) & subOverflow);
 
     assign zero = ~|res;
 

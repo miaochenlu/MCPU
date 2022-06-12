@@ -2,22 +2,24 @@
 `include "defines.vh"
 
 module ALU (
-    input [ 3:0]  ALUOp,
-    input [31:0] ALUSrcA,
-    input [31:0] ALUSrcB,
-    input [`ROB_ENTRY_WIDTH - 1:0] Dest_in,
+    input [ 3:0]                        ALUOp,
+    input [31:0]                        ALUSrcA,
+    input [31:0]                        ALUSrcB,
+    input [`ROB_ENTRY_WIDTH - 1:0]      Dest_in,
 
-    output reg busy,
-    output reg [31:0] res,
+    output reg                          busy,
+    output reg                          res_ready,
+    output reg [31:0]                   res,
     output reg [`ROB_ENTRY_WIDTH - 1:0] Dest_out,
-    output zero,
-    output overflow
+    output                              zero,
+    output                              overflow
 );
 
 
     always @(*) begin
-        busy = (ALUOp == 0) ? 1'd0 : 1'd1;
-        Dest_out = Dest_in;
+        res_ready = 1'd0;
+        busy      = (ALUOp == 0) ? 1'd0 : 1'd1;
+        Dest_out  = Dest_in;
 
         case(ALUOp)
             `ADD:  res = ALUSrcA + ALUSrcB;
@@ -34,6 +36,7 @@ module ALU (
             `OUTB: res = ALUSrcB;
             default: res = 32'd0;
         endcase
+        res_ready = 1'd1;
     end
 
     // overflow detection

@@ -9,9 +9,12 @@ module PC (
 );
     reg [31:0] pc;
     always @(posedge clk) begin
-        if(rst) pc <= 0;
-        else if(CE) pc <= pc_in;
-        else pc <= pc;
+        if(rst) 
+            pc <= 0;
+        else if(CE) 
+            pc <= pc_in;
+        else 
+            pc <= pc;
     end
     
     assign pc_out = pc;

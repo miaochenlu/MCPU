@@ -5,12 +5,11 @@ module Decoder(
     input [31:0] inst,
     // which fuction unit
     output [2:0] FUType,
-    output       RS1Use,
-    output       RS2Use,
+    output [6:0] opcode;
     output       RegWrite,
     output [3:0] ImmSel,
-    output       ALUSrcASel,
-    output       ALUSrcBSel,
+    output [1:0] OpASel,
+    output [1:0] OpBSel,
 
     // ALU function unit
     output [3:0] ALUCtrl,
@@ -19,9 +18,7 @@ module Decoder(
     output [3:0] MemCtrl,
 
     // branch unit
-    output [2:0] BrType,
-    output       Jalr,
-    output       Jal
+    output [3:0] BrCtrl,
 );
  
     wire    [6:0]   opcode;
@@ -107,8 +104,6 @@ module Decoder(
                   | ({3{is_I_MEM_type | is_S_type}} & `FU_LSQ)
                   | ({3{is_B_type | is_J_type | is_jalr}} & `FU_BRA);
 
-    assign RS1Use   = is_R_type | is_I_type | is_S_type | is_B_type | is_jalr;
-    assign RS2Use   = is_R_type | is_S_type | is_B_type;
     assign RegWrite = is_R_type | is_I_type | is_U_type | is_J_type;                                                                          
     
     assign ImmSel = {3{is_I_type}} & `I_TYPE_IMM
@@ -117,20 +112,22 @@ module Decoder(
                   | {3{is_J_type}} & `J_TYPE_IMM
                   | {3{is_U_type}} & `U_TYPE_IMM;
 
-    assign ALUSrcASel = is_R_type | is_I_MEM_type | is_I_LOGIC_type | is_S_type; // 0 for pc; 1 for reg
-    assign ALUSrcBSel = is_R_type; // 1 for reg; 0 for imm
+    assign OpASel = ({2{is_auipc}} & 2'b01)
+                  | ({2{is_R_type | is_I_MEM_type | is_I_LOGIC_type | is_S_type}} & 2'b10);
+                         // 0 for pc; 1 for reg
+    assign OpBSel = (2{is_I_LOGIC_type} & 2'b01)
+                  | (2{is_R_type} & 2'b10); // 2 for reg; 1 for imm
     
     assign ALUCtrl = {4{is_add | is_addi | is_I_MEM_type | is_S_type | is_auipc}} & `ADD
                    | {4{is_sub}} & `SUB
-                   | {4{is_and | is_andi}} & `AND
-                   | {4{is_or  | is_ori}} & `OR
-                   | {4{is_xor | is_xori}} & `XOR
-                   | {4{is_sll | is_slli}} & `SLL
-                   | {4{is_srl | is_srli}} & `SRL
-                   | {4{is_slt | is_slti}} & `SLT
+                   | {4{is_and  | is_andi }} & `AND
+                   | {4{is_or   | is_ori  }} & `OR
+                   | {4{is_xor  | is_xori }} & `XOR
+                   | {4{is_sll  | is_slli }} & `SLL
+                   | {4{is_srl  | is_srli }} & `SRL
+                   | {4{is_slt  | is_slti }} & `SLT
                    | {4{is_sltu | is_sltiu}} & `SLTU
-                   | {4{is_sra | is_srai}} & `SRA
-                   | {4{is_jal | is_jalr}} & `AP4
+                   | {4{is_sra  | is_srai }} & `SRA
                    | {4{is_lui}} & `OUTB;
 
     assign MemCtrl = ({4{is_lb}}  & `LB)
@@ -143,13 +140,13 @@ module Decoder(
                    | ({4{is_sw}}  & `SW);                  
     
     
-    assign BrType = ({3{is_beq}}  & `BEQ)
-                  | ({3{is_bne}}  & `BNE)
-                  | ({3{is_blt}}  & `BLT)
-                  | ({3{is_bge}}  & `BGE)
-                  | ({3{is_bltu}} & `BLTU)
-                  | ({3{is_bgeu}} & `BGEU);
-    assign Jal  = is_J_type;
-    assign Jalr = is_jalr;
+    assign BrCtrl = ({4{is_beq}}  & `BEQ)
+                  | ({4{is_bne}}  & `BNE)
+                  | ({4{is_blt}}  & `BLT)
+                  | ({4{is_bge}}  & `BGE)
+                  | ({4{is_bltu}} & `BLTU)
+                  | ({4{is_bgeu}} & `BGEU)
+                  | ({4{is_jal }} & `JAL)
+                  | ({4{is_jalr}} & `JALR);
     
 endmodule

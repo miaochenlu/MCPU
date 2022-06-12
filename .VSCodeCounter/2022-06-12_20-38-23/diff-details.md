@@ -1,0 +1,27 @@
+# Diff Details
+
+Date : 2022-06-12 20:38:23
+
+Directory c:\\Users\\Dell 7080\\Desktop\\Coding\\MCPU
+
+Total : 12 files,  358 codes, 4 comments, 31 blanks, all 393 lines
+
+[Summary](results.md) / [Details](details.md) / [Diff Summary](diff.md) / Diff Details
+
+## Files
+| filename | language | code | comment | blank | total |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| [o3cpu/sim/rs_bra_tb.v](/o3cpu/sim/rs_bra_tb.v) | Verilog | 101 | 0 | 12 | 113 |
+| [o3cpu/src/alu.v](/o3cpu/src/alu.v) | Verilog | 3 | 0 | 0 | 3 |
+| [o3cpu/src/bra.v](/o3cpu/src/bra.v) | Verilog | 50 | 0 | 0 | 50 |
+| [o3cpu/src/cdb.v](/o3cpu/src/cdb.v) | Verilog | 10 | 3 | 4 | 17 |
+| [o3cpu/src/decoder.v](/o3cpu/src/decoder.v) | Verilog | -5 | 1 | 0 | -4 |
+| [o3cpu/src/mcpu.v](/o3cpu/src/mcpu.v) | Verilog | 67 | -2 | -2 | 63 |
+| [o3cpu/src/pc.v](/o3cpu/src/pc.v) | Verilog | 3 | 0 | 0 | 3 |
+| [o3cpu/src/rat.v](/o3cpu/src/rat.v) | Verilog | -3 | 0 | 0 | -3 |
+| [o3cpu/src/reorder_buffer.v](/o3cpu/src/reorder_buffer.v) | Verilog | 74 | 2 | 8 | 84 |
+| [o3cpu/src/rs_alu.v](/o3cpu/src/rs_alu.v) | Verilog | 14 | 0 | 2 | 16 |
+| [o3cpu/src/rs_bra.v](/o3cpu/src/rs_bra.v) | Verilog | 28 | 0 | 5 | 33 |
+| [o3cpu/src/rs_lsq.v](/o3cpu/src/rs_lsq.v) | Verilog | 16 | 0 | 2 | 18 |
+
+[Summary](results.md) / [Details](details.md) / [Diff Summary](diff.md) / Diff Details

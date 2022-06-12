@@ -2,9 +2,9 @@
 `include "defines.vh"
 
 module RSLSQ (
-    input clk,
-    input rst,
-    input rollback,
+    input  clk,
+    input  rst,
+    input  rollback,
     output full,
     output empty,
 
@@ -21,6 +21,9 @@ module RSLSQ (
     // CDB write result
     input [`ROB_ENTRY_WIDTH - 1:0]      CDB_ALU_ROB_index,
     input [31:0]                        CDB_ALU_data,
+
+    input [`ROB_ENTRY_WIDTH - 1:0]      CDB_LSQ_ROB_index,
+    input [31:0]                        CDB_LSQ_data,
 
     // to function unit
     output reg [`LSQ_OP_WIDTH - 1:0]    Op_out,
@@ -88,12 +91,12 @@ module RSLSQ (
                 Dest[i]     <= 0;
                 Status[i]   <= 0;
             end
-            head           <= 1'd1;
-            tail           <= 1'd1;
-            counter        <= 1'd0;
-            commit_pointer <= 0;
-            counter_plus   <= 1'd0;
-            counter_minus  <= 1'd0;
+            head            <= 1'd1;
+            tail            <= 1'd1;
+            counter         <= 1'd0;
+            commit_pointer  <= 0;
+            counter_plus    <= 1'd0;
+            counter_minus   <= 1'd0;
         end
         else if(rollback) begin
             if(commit_pointer == 0) begin
@@ -104,7 +107,8 @@ module RSLSQ (
             end
             else begin
                 tail    <= (commit_pointer == `RSLSQ_ENTRY_NUM) ? 1 : commit_pointer + 1;
-                counter <= (commit_pointer >= head) ? (commit_pointer - head + 1) : (commit_pointer + `RSLSQ_ENTRY_NUM - head + 1);
+                counter <= (commit_pointer >= head) ? (commit_pointer - head + 1) : 
+                                                      (commit_pointer + `RSLSQ_ENTRY_NUM - head + 1);
             end
 
             for(i = 0; i <= `RSLSQ_ENTRY_NUM; i = i + 1) begin
@@ -132,12 +136,26 @@ module RSLSQ (
                 for(i = 1; i < `RSLSQ_ENTRY_NUM; i = i + 1) begin
                     if(CDB_ALU_ROB_index == Qj[i]) begin
                         Vj[i]   <= CDB_ALU_data;
-                        Qj[i]   <= {`ROB_ENTRY_WIDTH{0}};
+                        Qj[i]   <= 0;
                         Addr[i] <= CDB_ALU_data + Offset[i];
                     end
                     if(CDB_ALU_ROB_index == Qk[i]) begin
-                        Vk[i] <= CDB_ALU_data;
-                        Qk[i] <= {`ROB_ENTRY_WIDTH{0}};
+                        Vk[i]   <= CDB_ALU_data;
+                        Qk[i]   <= 0;
+                    end
+                end
+            end
+
+            if(CDB_LSQ_ROB_index != 0) begin
+                for(i = 1; i <= `RSLSQ_ENTRY_NUM; i = i + 1) begin
+                    if(CDB_LSQ_ROB_index == Qj[i]) begin
+                        Vj[i]   <= CDB_LSQ_data;
+                        Qj[i]   <= 0;
+                        Addr[i] <= CDB_LSQ_data + Offset[i];
+                    end
+                    if(CDB_LSQ_ROB_index == Qk[i]) begin
+                        Vk[i]   <= CDB_LSQ_data;
+                        Qk[i]   <= 0;
                     end
                 end
             end
@@ -155,11 +173,11 @@ module RSLSQ (
 
             /*****************allocate entry in lsq*********************/
             if(issue_we) begin
-                Op[tail] <= Op_in;
-                Vj[tail] <= Vj_in;
-                Vk[tail] <= Vk_in;
-                Qj[tail] <= Qj_in;
-                Qk[tail] <= Qk_in;
+                Op[tail]     <= Op_in;
+                Vj[tail]     <= Vj_in;
+                Vk[tail]     <= Vk_in;
+                Qj[tail]     <= Qj_in;
+                Qk[tail]     <= Qk_in;
                 Offset[tail] <= Offset_in;
                 Dest[tail]   <= Dest_in;
                 Commit[i]    <= 1'd0;
@@ -175,20 +193,20 @@ module RSLSQ (
             if((Busy[head] == 1'd1) && ((Op[head] & 4'b1000) == 4'd0) && (Qj[head] == {`ROB_ENTRY_WIDTH{0}})) begin
                 /****************start to load*******************/
                 if(Status[head] == 1'd0) begin
-                    Op_out         <= Op[head];
-                    Addr_out       <= Addr[head];
-                    Status[head]   <= 1'd1; // start to execute
+                    Op_out          <= Op[head];
+                    Addr_out        <= Addr[head];
+                    Status[head]    <= 1'd1; // start to execute
                 end
                 /****************load finish*******************/
                 else if(Status[head] == 1'd1 && mem_rd_ready) begin
-                    rd_data      <= mem_rd_data; 
-                    Dest_out     <= Dest[head];
-                    Busy[head]   <= 1'd0;
-                    Op[head]     <= 1'd0;
-                    Status[head] <= 1'd0;
+                    rd_data         <= mem_rd_data; 
+                    Dest_out        <= Dest[head];
+                    Busy[head]      <= 1'd0;
+                    Op[head]        <= 1'd0;
+                    Status[head]    <= 1'd0;
 
-                    head          <= (head == `RSLSQ_ENTRY_NUM) ? 1 : head + 1;
-                    counter_minus <= 1'd1;
+                    head            <= (head == `RSLSQ_ENTRY_NUM) ? 1 : head + 1;
+                    counter_minus   <= 1'd1;
                 end
 
             end
@@ -196,27 +214,27 @@ module RSLSQ (
             // if store inst is ready to commit
             if(Busy[head] && (Op[head] & 4'b1000 == 4'b1000) && Qj[head] == 0 && Qk[head] == 0 && Commit[head] == 1'd1) begin
                 if(Status[head] == 1'd0) begin
-                    Op_out         <= Op[head];
-                    Addr_out       <= Addr[head];
-                    mem_wr_data    <= Vk[head];
-                    Status[head]   <= 1'd1; // start to execute
+                    Op_out          <= Op[head];
+                    Addr_out        <= Addr[head];
+                    mem_wr_data     <= Vk[head];
+                    Status[head]    <= 1'd1; // start to execute
                 end
                 else if(Status[head] == 1'd1 && mem_wr_ready) begin
-                    Busy[head]   <= 1'd0;
-                    Op[head]     <= 1'd0;
-                    Status[head] <= 1'd0;
-                    Commit[head] <= 1'd0;
+                    Busy[head]      <= 1'd0;
+                    Op[head]        <= 1'd0;
+                    Status[head]    <= 1'd0;
+                    Commit[head]    <= 1'd0;
 
                     if(commit_pointer == head) commit_pointer = 0;  // the inst is committed
 
-                    head          <= (head == `RSLSQ_ENTRY_NUM) ? 1 : head + 1;
-                    counter_minus <= 1'd1;
+                    head            <= (head == `RSLSQ_ENTRY_NUM) ? 1 : head + 1;
+                    counter_minus   <= 1'd1;
                 end
             end
-             counter <= {`RSLSQ_ENTRY_WIDTH{ counter_plus &  counter_minus}} & counter
-                     || {`RSLSQ_ENTRY_WIDTH{ counter_plus & ~counter_minus}} & counter + 1
-                     || {`RSLSQ_ENTRY_WIDTH{~counter_plus &  counter_minus}} & counter - 1  
-                     || {`RSLSQ_ENTRY_WIDTH{~counter_plus & ~counter_minus}} & counter;
+            counter <= {`RSLSQ_ENTRY_WIDTH{ counter_plus &  counter_minus}} & counter
+                    || {`RSLSQ_ENTRY_WIDTH{ counter_plus & ~counter_minus}} & counter + 1
+                    || {`RSLSQ_ENTRY_WIDTH{~counter_plus &  counter_minus}} & counter - 1  
+                    || {`RSLSQ_ENTRY_WIDTH{~counter_plus & ~counter_minus}} & counter;
         end
     end
 

@@ -19,22 +19,25 @@ module RSALU (
     input [`ROB_ENTRY_WIDTH - 1:0]      CDB_ALU_ROB_index,
     input [31:0]                        CDB_ALU_data,
 
+    input [`ROB_ENTRY_WIDTH - 1:0]      CDB_LSQ_ROB_index,
+    input [31:0]                        CDB_LSQ_data,
+
     // to function unit
     output reg [`ALU_OP_WIDTH - 1:0]    Op_out,
     output reg [31:0]                   Vj_out,
     output reg [31:0]                   Vk_out,
     output reg [`ROB_ENTRY_WIDTH - 1:0] Dest_out
 );
-    reg                         Busy[`RSALU_ENTRY_NUM: 0];
+    reg                                 Busy[`RSALU_ENTRY_NUM: 0];
     // the operation
-    reg [`ALU_OP_WIDTH - 1:0]   Op[`RSALU_ENTRY_NUM: 0];
+    reg [`ALU_OP_WIDTH - 1:0]           Op[`RSALU_ENTRY_NUM: 0];
     // the value of the source operands
-    reg [31:0]                  Vj[`RSALU_ENTRY_NUM: 0];
-    reg [31:0]                  Vk[`RSALU_ENTRY_NUM: 0];
+    reg [31:0]                          Vj[`RSALU_ENTRY_NUM: 0];
+    reg [31:0]                          Vk[`RSALU_ENTRY_NUM: 0];
     // the reorder buffer index that produce the value 
-    reg [`ROB_ENTRY_WIDTH - 1:0] Qj[`RSALU_ENTRY_NUM: 0];
-    reg [`ROB_ENTRY_WIDTH - 1:0] Qk[`RSALU_ENTRY_NUM: 0];
-    reg [`ROB_ENTRY_WIDTH - 1:0] Dest[`RSALU_ENTRY_NUM: 0];
+    reg [`ROB_ENTRY_WIDTH - 1:0]        Qj[`RSALU_ENTRY_NUM: 0];
+    reg [`ROB_ENTRY_WIDTH - 1:0]        Qk[`RSALU_ENTRY_NUM: 0];
+    reg [`ROB_ENTRY_WIDTH - 1:0]        Dest[`RSALU_ENTRY_NUM: 0];
 
     integer i;
 
@@ -90,6 +93,19 @@ module RSALU (
                     end
                     if(CDB_ALU_ROB_index == Qk[i]) begin
                         Vk[i] <= CDB_ALU_data;
+                        Qk[i] <= 0;
+                    end
+                end
+            end
+
+            if(CDB_LSQ_ROB_index != 0) begin
+                for(i = 1; i <= `RSALU_ENTRY_NUM; i = i + 1) begin
+                    if(CDB_LSQ_ROB_index == Qj[i]) begin
+                        Vj[i] <= CDB_LSQ_data;
+                        Qj[i] <= 0;
+                    end
+                    if(CDB_LSQ_ROB_index == Qk[i]) begin
+                        Vk[i] <= CDB_LSQ_data;
                         Qk[i] <= 0;
                     end
                 end

@@ -35,12 +35,12 @@ module MCPU (
 
     Mux21_32 M_Mux21_32_PCSrc(
         .in0(PC_p4),
-        .in1(JumpPC),
-        .sel(DoJump),
+        .in1(CDB_BRA_JumpAddr),
+        .sel(CDB_BRA_Jump_en),
         .out(NextPC)
     );
 
-    IF_IS M_IF_ID (
+    IF_ID M_IF_ID (
         .clk(clk),
         .rst(rst),
         .EN(IF_ID_EN),
@@ -103,6 +103,10 @@ module MCPU (
         .BrType(BrType_ID),
         .Jalr(Jalr),
         .Jal(Jal)
+    );
+
+    HazardUnit M_HazardUnit (
+
     );
 
     ID_DP M_ID_DP (
@@ -180,7 +184,7 @@ module MCPU (
 
     // read operands from Regfile & ROB
     OperandAManager M_OperandAManager (
-        .SrcASel(SrcASel_DP),
+        .OpASel(OpASel_DP),
         .PC(PC_DP),
         .RAT_valid(RAT_valid1),
         .RAT_value(RAT_rdata1),
@@ -192,7 +196,7 @@ module MCPU (
     );
 
     OperandBManager M_OperandBManager (
-        .SrcBSel(SrcBSel_DP),
+        .OpBSel(OpBSel_DP),
         .imm(imm_DP),
         .RAT_valid(RAT_valid2),
         .RAT_value(RAT_rdata2),
@@ -208,53 +212,89 @@ module MCPU (
     RSALU M_RSALU (
         .clk(clk),
         .rst(rst),
-        .full(RSALU_full),
-
+        .full(full),
         .issue_we(RSALU_we),
-        .Op_in(ALUCtrl_DP),
+        .Op_in(Op_in),
         .Vj_in(OpAValue),
         .Vk_in(OpBValue),
         .Qj_in(OpA_ROB_index),
         .Qk_in(OpB_ROB_index),
         .Dest_in(Dest_in),
-        
-        .Op_out(RSALU_Op),
+        .CDB_ALU_ROB_index(CDB_ALU_ROB_index),
+        .CDB_ALU_data(CDB_ALU_data),
+        .CDB_LSQ_ROB_index(CDB_LSQ_ROB_index),
+        .CDB_LSQ_data(CDB_LSQ_data),
+        .Op_out(ALUOp),
         .Vj_out(ALUSrcA),
         .Vk_out(ALUSrcB),
-        .Dest_out(ALUDest)
+        .Dest_out(ALUDest_in)
     );
 
     RSLSQ M_RSLSQ (
         .clk(clk),
         .rst(rst),
-        .full(RSLSQ_full),
-        
+        .rollback(rollback),
+        .full(full),
+        .empty(),
         .issue_we(RSLSQ_we),
-        .Op_in(MemCtrl_DP),
+        .Op_in(Op_in),
         .Vj_in(OpAValue),
-        .Vk_in(imm_DP),
+        .Vk_in(OpBValue),
         .Qj_in(OpA_ROB_index),
+        .Qk_in(OpB_ROB_index),
+        .Offset_in(imm_DP),
         .Dest_in(Dest_in),
+        .CDB_ALU_ROB_index(CDB_ALU_ROB_index),
+        .CDB_ALU_data(CDB_ALU_data),
+        .CDB_LSQ_ROB_index(CDB_LSQ_ROB_index),
+        .CDB_LSQ_data(CDB_LSQ_data),
+        .Op_out(LSQOp),
+        .Addr_out(LSQAddr),
+        .mem_rd_ready(mem_rd_ready),
+        .mem_rd_data(mem_rd_data),
+        .mem_wr_ready(mem_wr_ready),
+        .mem_wr_data(mem_wr_data),
+        .ROB_index_commit(LSQ_ROB_index_commit),
+        .rd_data(LSQ_rd_data),
+        .Dest_out(LSQDest_out),
+    );
 
-        .Op_out(RSLSQ_Op)
-        // for load
-        .Addr_out(RSLSQ_Addr),
-        //for store
-
-
-        .rd_ready(rd_ready),
-        .wr_ready(wr_ready)
+    RSBRA M_RSBRA (
+        .clk(clk),
+        .rst(rst),
+        .full(full),
+        .issue_we(RSBRA_we),
+        .Op_in(Op_in),
+        .Vj_in(OpAValue),
+        .Vk_in(OpBValue),
+        .Qj_in(OpA_ROB_index),
+        .Qk_in(OpB_ROB_index),
+        .PC_in(PC_in),
+        .Offset_in(imm_DP),
+        .Dest_in(Dest_in),
+        .CDB_ALU_ROB_index(CDB_ALU_ROB_index),
+        .CDB_ALU_data(CDB_ALU_data),
+        .CDB_LSQ_ROB_index(CDB_LSQ_ROB_index),
+        .CDB_LSQ_data(CDB_LSQ_data),
+        .func_busy(BRA_busy),
+        .Op_out(BRAOp),
+        .Vj_out(BRASrcA),
+        .Vk_out(BRASrcB),
+        .PC_out(BRAPC),
+        .Offset_out(BRAOffset),
+        .Dest_out(BRADest_in)
     );
 
 /**********************Execute*******************/
 
     ALU M_ALU (
-        .ALUOp(RSALU_Op),
+        .ALUOp(ALUOp),
         .ALUSrcA(ALUSrcA),
         .ALUSrcB(ALUSrcB),
         .Dest_in(ALUDest_in),
-        .busy(ALU_busy),
-        .res(ALU_res),
+        .busy(ALUBusy),
+        .res_ready(ALURes_ready),
+        .res(ALURes),
         .Dest_out(ALUDest_out),
         .zero(),
         .overflow()
@@ -263,22 +303,49 @@ module MCPU (
 
     RAM M_RAM (
         .clk(~clk),
-        .mem_ctrl(MemCtrl),
-        .wr_addr(mem_addr),
-        .wr_data(MemWriteData_MEM),
-        .rd_addr(mem_addr),
-        .rd_ready(),
-        .wr_ready(),
-        .rd_data(MemRdData_MEM)
+        .mem_ctrl(LSQOp),
+        .wr_addr(LSQAddr),
+        .wr_data(mem_wr_data),
+        .rd_addr(LSQAddr),
+        .rd_ready(mem_rd_ready),
+        .wr_ready(mem_wr_ready),
+        .rd_data(mem_rd_data)
+    );
+
+    BRA M_BRA (
+        .BRAOp(BRAOp),
+        .BRASrcA(BRASrcA),
+        .BRASrcB(BRASrcB),
+        .PC(BRAPC),
+        .Offset(BRAOffset),
+        .Dest_in(BRADest_in),
+        .busy(BRA_busy),
+        .res_ready(BRARes_ready);
+        .Jump_en(BRAJump_en),
+        .JumpAddr(BRAJumpAddr),
+        .Dest_val(BRA_Dest_val),
+        .Dest_out(BRADest_out),
     );
 
     CDB M_CDB (
-        .ALURes_ready(ALURes_ready),
-        .ALUData_in(ALU_res),
-        .ALUDest_in(ALUDest_out),
-        .ALURes_rec(),
-        .ALUData_out(CDB_ALUData_out),
-        .ALUDest_out(CDB_ALUDest_out)
+        .CDB_ALUData_in(ALURes),
+        .CDB_ALUDest_in(ALUDest_out),
+        .CDB_ALUData_out(CDB_ALU_data),
+        .CDB_ALUDest_out(CDB_ALU_ROB_index),
+
+        .CDB_LSQData_in(LSQ_rd_data),
+        .CDB_LSQDest_in(LSQDest_out),
+        .CDB_LSQData_out(CDB_LSQ_data),
+        .CDB_LSQDest_out(CDB_LSQ_ROB_index),
+
+        .CDB_BRAJump_en_in(BRAJump_en),
+        .CDB_BRAJumpAddr_in(BRAJumpAddr),
+        .CDB_BRAData_in(BRA_Dest_val),
+        .CDB_BRADest_in(BRADest_out),
+        .CDB_BRAJump_en_out(CDB_BRA_Jump_en),
+        .CDB_BRAJumpAddr_out(CDB_BRA_JumpAddr),
+        .CDB_BRAData_out(CDB_BRA_data),
+        .CDB_BRADest_out(CDB_BRA_ROB_index)
     );
 /*******************write result*****************/
 

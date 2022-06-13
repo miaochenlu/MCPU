@@ -7,14 +7,14 @@ module RAT (
     input rollback,
     // read operands
     input  [4:0]                    raddr1,
-    output                          valid1,          // is value 1 ready in regfile
-    output [31:0]                   rdata1,   // if valid, the data
-    output [`ROB_ENTRY_WIDTH - 1:0] ROB_index1_out, // if not valid, the pointer to rob
+    output reg                         valid1,          // is value 1 ready in regfile
+    output reg [31:0]                   rdata1,   // if valid, the data
+    output reg [`ROB_ENTRY_WIDTH - 1:0] ROB_index1_out, // if not valid, the pointer to rob
     
     input  [4:0]                    raddr2,
-    output                          valid2,
-    output [31:0]                   rdata2,
-    output [`ROB_ENTRY_WIDTH - 1:0] ROB_index2_out,
+    output reg                         valid2,
+    output reg [31:0]                   rdata2,
+    output reg [`ROB_ENTRY_WIDTH - 1:0] ROB_index2_out,
     
     // set dst reg
     input                           dec_we, // set rob entry
@@ -66,14 +66,28 @@ module RAT (
         end
     end
 
-    // read operand 1
-    assign valid1         = Valid[raddr1];
-    assign rdata1         = Value[raddr1];
-    assign ROB_index1_out = ROBAddr[raddr1];
-    
-    // read operand 2
-    assign valid2         = Valid[raddr2];
-    assign rdata2         = Value[raddr2];
-    assign ROB_index2_out = ROBAddr[raddr2];
+    always @(*) begin
+        if(ROB_we && waddr != 0 && raddr1 == ROB_addr_commit) begin
+            valid1 = 1;
+            rdata1 = ROB_data_commit;
+            ROB_index1_out = 0;
+        end
+        else begin
+            valid1         = Valid[raddr1];
+            rdata1         = Value[raddr1];
+            ROB_index1_out = ROBAddr[raddr1];
+        end
+
+        if(ROB_we && waddr != 0 && raddr2 == ROB_addr_commit) begin
+            valid2 = 1;
+            rdata2 = ROB_data_commit;
+            ROB_index2_out = 0;
+        end
+        else begin
+            valid2         = Valid[raddr2];
+            rdata2         = Value[raddr2];
+            ROB_index2_out = ROBAddr[raddr2];
+        end
+    end
 
 endmodule

@@ -12,8 +12,8 @@
 `define RSLSQ_ENTRY_WIDTH 2
 `define LSQ_OP_WIDTH 4
 
-`define ROB_ENTRY_NUM 255
-`define ROB_ENTRY_WIDTH 8
+`define ROB_ENTRY_NUM 15
+`define ROB_ENTRY_WIDTH 4
 
 
 `define FU_EMP 3'd0 // empty

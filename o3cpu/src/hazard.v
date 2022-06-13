@@ -13,8 +13,7 @@ module HazardUnit(
     output      IF_ID_Stall,
     output      IF_ID_Flush,
     output      ID_RN_Flush,
-    output      RN_RO_Flush,
-    output      RO_DP_Flush,
+    output      RN_DP_Flush,
     output      ROB_rollback,
     output      RAT_rollback,
     output      RSLSQ_rollback,
@@ -39,8 +38,7 @@ module HazardUnit(
     assign RSBRA_rollback = MisPredict;
 
     assign ID_RN_Flush    = MisPredict | ControlStall;
-    assign RN_RO_Flush    = MisPredict | ControlStall;
-    assign RO_DP_Flush    = MisPredict | ControlStall;
+    assign RN_DP_Flush    = MisPredict | ControlStall;
 
 
 endmodule

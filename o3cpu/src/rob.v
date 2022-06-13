@@ -109,23 +109,8 @@ module ROB (
         else begin
             counter_plus  <= 0;
             counter_minus <= 0;
-        /*****************************decode write****************************/
-            if(write_en & ~full) begin
-                Valid[tail]         <= 1'd1;
-                Ready[tail]         <= 1'd0;
-                OpCode[tail]        <= OpCode_in;
-                PC[tail]       <= pc_in;
-                DestRegID[tail]     <= waddr_in;
-                DestRegVal[tail]    <= 32'd0;
-                PredTaken[i]        <= branch_pred_taken;
-                ActTaken[i]         <= 0;
-                JumpAddr[i]         <= 0;
 
-                tail                <= (tail == `ROB_ENTRY_NUM) ? 1 : tail + 1;
-                counter_plus        <= 1'd1;
-            end
         /*****************************CDB write****************************/
-
             if(CDB_ALU_ROB_index != 0) begin
                 DestRegVal[CDB_ALU_ROB_index] <= CDB_ALU_data;
                 Ready[CDB_ALU_ROB_index]      <= 1'd1;
@@ -141,6 +126,22 @@ module ROB (
                 JumpAddr[CDB_BRA_ROB_index]   <= CDB_BRA_JumpAddr;
                 DestRegVal[CDB_BRA_ROB_index] <= CDB_BRA_data;
                 Ready[CDB_BRA_ROB_index]      <= 1'd1;
+            end
+
+        /*****************************decode write****************************/
+            if(write_en & ~full) begin
+                Valid[tail]         <= 1'd1;
+                Ready[tail]         <= 1'd0;
+                OpCode[tail]        <= OpCode_in;
+                PC[tail]            <= pc_in;
+                DestRegID[tail]     <= waddr_in;
+                DestRegVal[tail]    <= 32'd0;
+                PredTaken[i]        <= branch_pred_taken;
+                ActTaken[i]         <= 0;
+                JumpAddr[i]         <= 0;
+
+                tail                <= (tail == `ROB_ENTRY_NUM) ? 1 : tail + 1;
+                counter_plus        <= 1'd1;
             end
 
         /*****************************commit****************************/

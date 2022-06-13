@@ -17,7 +17,7 @@ module RN_DP(
     input [`ROB_ENTRY_WIDTH - 1:0] ROB_dest_RN,
     input [ 3:0]        ALUCtrl_RN,
     input [ 3:0]        MemCtrl_RN,
-    input [ 3:0]        BraCtrl_RN,
+    input [ 3:0]        BRACtrl_RN,
     input [31:0]        Imm_RN,
     input [31:0]        OpAValue_RN,
     input [`ROB_ENTRY_WIDTH - 1:0] OpA_ROB_index_RN,
@@ -33,7 +33,7 @@ module RN_DP(
     output reg [`ROB_ENTRY_WIDTH - 1:0] ROB_dest_DP,
     output reg [ 3:0]   ALUCtrl_DP,
     output reg [ 3:0]   MemCtrl_DP,
-    output reg [ 3:0]   BraCtrl_DP,
+    output reg [ 3:0]   BRACtrl_DP,
     output reg [31:0]   Imm_DP,
     output reg [31:0]   OpAValue_DP,
     output reg [`ROB_ENTRY_WIDTH - 1:0] OpA_ROB_index_DP,
@@ -52,7 +52,7 @@ module RN_DP(
             ROB_dest_DP <= 0;
             ALUCtrl_DP <= 0;
             MemCtrl_DP <= 0;
-            BraCtrl_DP <= 0;
+            BRACtrl_DP <= 0;
             Imm_DP <= 0;
             OpAValue_DP <= 0;
             OpA_ROB_index_DP <= 0;
@@ -70,7 +70,7 @@ module RN_DP(
                 ROB_dest_DP <= ROB_dest_DP;
                 ALUCtrl_DP <= ALUCtrl_DP;
                 MemCtrl_DP <= MemCtrl_DP;
-                BraCtrl_DP <= BraCtrl_DP;
+                BRACtrl_DP <= BRACtrl_DP;
                 Imm_DP <= Imm_DP;
                 OpAValue_DP <= OpAValue_DP;
                 OpA_ROB_index_DP <= OpA_ROB_index_DP;
@@ -87,7 +87,7 @@ module RN_DP(
                 ROB_dest_DP <= 0;
                 ALUCtrl_DP <= 0;
                 MemCtrl_DP <= 0;
-                BraCtrl_DP <= 0;
+                BRACtrl_DP <= 0;
                 Imm_DP <= 0;
                 OpAValue_DP <= 0;
                 OpA_ROB_index_DP <= 0;
@@ -104,7 +104,7 @@ module RN_DP(
                 ROB_dest_DP <= ROB_dest_RN;
                 ALUCtrl_DP <= ALUCtrl_RN;
                 MemCtrl_DP <= MemCtrl_RN;
-                BraCtrl_DP <= BraCtrl_RN;
+                BRACtrl_DP <= BRACtrl_RN;
                 Imm_DP <= Imm_RN;
                 OpAValue_DP <= OpAValue_RN;
                 OpA_ROB_index_DP <= OpA_ROB_index_RN;
@@ -122,7 +122,7 @@ module RN_DP(
             ROB_dest_DP <= ROB_dest_DP;
             ALUCtrl_DP <= ALUCtrl_DP;
             MemCtrl_DP <= MemCtrl_DP;
-            BraCtrl_DP <= BraCtrl_DP;
+            BRACtrl_DP <= BRACtrl_DP;
             Imm_DP <= Imm_DP;
             OpAValue_DP <= OpAValue_DP;
             OpA_ROB_index_DP <= OpA_ROB_index_DP;

@@ -28,7 +28,7 @@ module MCPU (
     wire [1:0] OpBSel_ID;
     wire [`ALU_OP_WIDTH - 1:0] ALUCtrl_ID;
     wire [`LSQ_OP_WIDTH - 1:0] MemCtrl_ID;
-    wire [`BRA_OP_WIDTH - 1:0] BraCtrl_ID;
+    wire [`BRA_OP_WIDTH - 1:0] BRACtrl_ID;
 
     wire ID_RN_EN;
     wire ID_RN_Flush;
@@ -44,55 +44,51 @@ module MCPU (
     wire [3:0] ImmSel_RN;
     wire [1:0] OpASel_RN;
     wire [1:0] OpBSel_RN;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_dest_RN;
     wire [`ALU_OP_WIDTH - 1:0] ALUCtrl_RN;
     wire [`LSQ_OP_WIDTH - 1:0] MemCtrl_RN;
-    wire [`BRA_OP_WIDTH - 1:0] BraCtrl_RN;
-
-    wire RN_RO_EN;
-    wire RN_RO_Flush;
-
-    // Read Operands
-    wire [31:0] PC_RO;
-    wire [31:0] inst_RO;
-    wire [6:0] OpCode_RO;
-    wire [2:0] FUType_RO;
-    wire [3:0] ImmSel_RO;
-    wire [1:0] OpASel_RO;
-    wire [1:0] OpBSel_RO;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_windex;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_dest_RO;
-    wire [`ALU_OP_WIDTH - 1:0] ALUCtrl_RO;
-    wire [`LSQ_OP_WIDTH - 1:0] MemCtrl_RO;
-    wire [`BRA_OP_WIDTH - 1:0] BraCtrl_RO;
+    wire [`BRA_OP_WIDTH - 1:0] BRACtrl_RN;
 
     wire RAT_rollback;
-    wire RAT_valid1_RO;
-    wire RAT_valid2_RO;
-    wire [31:0] RAT_rdata1_RO;
-    wire [31:0] RAT_rdata2_RO;
+    wire RAT_valid1_RN;
+    wire RAT_valid2_RN;
+    wire [31:0] RAT_rdata1_RN;
+    wire [31:0] RAT_rdata2_RN;
 
     wire ROB_full;
     wire ROB_empty;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_rindex1_RO;
-    wire [31:0] ROB_rdata1_RO;
-    wire ROB_ready1_RO;
+    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_rindex1_RN;
+    wire [31:0] ROB_rdata1_RN;
+    wire ROB_ready1_RN;
     
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_rindex2_RO;
-    wire [31:0] ROB_rdata2_RO;
-    wire ROB_ready2_RO;
+    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_rindex2_RN;
+    wire [31:0] ROB_rdata2_RN;
+    wire ROB_ready2_RN;
 
+    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_windex;
+    wire ROB_we;
+    wire [ 4:0] ROB_addr_commit;
+    wire [31:0] ROB_data_commit;
+    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_index_commit2reg;
+    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_index_commit2lsq;
 
-    wire [31:0] Imm_RO;
+    wire ROB_IsBranch;
+    wire [31:0] ROB_BranchInstPC;
+    wire ROB_BranchTaken;
+    wire ROB_MisPredict;
+    wire [31:0] ROB_JumpAddr;
 
-    wire [31:0] OpAValue_RO;
-    wire [`ROB_ENTRY_WIDTH - 1:0] OpA_ROB_index_RO;
-    wire [31:0] OpBValue_RO;
-    wire [`ROB_ENTRY_WIDTH - 1:0] OpB_ROB_index_RO;
+    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_dest_RN;
 
-    wire RO_DP_EN;
-    wire RO_DP_Flush;
-    wire RO_DP_Stall;
+    wire [31:0] Imm_RN;
+
+    wire [31:0] OpAValue_RN;
+    wire [`ROB_ENTRY_WIDTH - 1:0] OpA_ROB_index_RN;
+    wire [31:0] OpBValue_RN;
+    wire [`ROB_ENTRY_WIDTH - 1:0] OpB_ROB_index_RN;
+
+    wire RN_DP_EN;
+    wire RN_DP_Flush;
+    wire RN_DP_Stall;
 
     // Dispatch
 
@@ -105,7 +101,7 @@ module MCPU (
     wire [`ROB_ENTRY_WIDTH - 1:0] ROB_dest_DP;
     wire [`ALU_OP_WIDTH - 1:0] ALUCtrl_DP;
     wire [`LSQ_OP_WIDTH - 1:0] MemCtrl_DP;
-    wire [`BRA_OP_WIDTH - 1:0] BraCtrl_DP;
+    wire [`BRA_OP_WIDTH - 1:0] BRACtrl_DP;
     wire [31:0] Imm_DP;
     wire [31:0] OpAValue_DP;
     wire [`ROB_ENTRY_WIDTH - 1:0] OpA_ROB_index_DP;
@@ -171,21 +167,7 @@ module MCPU (
     
     assign IF_ID_EN = 1;
     assign ID_RN_EN = 1;
-    assign RN_RO_EN = 1;
-    assign RO_DP_EN = 1;
-
-
-    wire ROB_we;
-    wire [4:0] ROB_addr_commit; // reg addr
-    wire [31:0] ROB_data_commit;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_index_commit2reg;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_index_commit2lsq;
-
-    wire ROB_IsBranch;
-    wire [31:0] ROB_BranchInstPC;
-    wire ROB_BranchTaken;
-    wire ROB_MisPredict;
-    wire [31:0] ROB_JumpAddr;
+    assign RN_DP_EN = 1;
 
     /**********************fetch*********************/
 
@@ -206,8 +188,8 @@ module MCPU (
 
     Mux21_32 M_Mux21_32_PCSrc(
         .in0(PC_p4),
-        .in1(ROB_JumpAddr),
-        .sel(ROB_BranchTaken && ROB_IsBranch),
+        .in1(CDB_BRA_JumpAddr),
+        .sel(CDB_BRA_Jump_en),
         .out(NextPC)
     );
     
@@ -236,7 +218,7 @@ module MCPU (
         .OpBSel(OpBSel_ID),
         .ALUCtrl(ALUCtrl_ID),
         .MemCtrl(MemCtrl_ID),
-        .BraCtrl(BraCtrl_ID)
+        .BRACtrl(BRACtrl_ID)
     );
 
     HazardUnit M_HazardUnit (
@@ -250,8 +232,7 @@ module MCPU (
         .IF_ID_Stall(IF_ID_Stall),
         .IF_ID_Flush(IF_ID_Flush),
         .ID_RN_Flush(ID_RN_Flush),
-        .RN_RO_Flush(RN_RO_Flush),
-        .RO_DP_Flush(RO_DP_Flush),
+        .RN_DP_Flush(RN_DP_Flush),
         .ROB_rollback(ROB_rollback),
         .RAT_rollback(RAT_rollback),
         .RSLSQ_rollback(RSLSQ_rollback),
@@ -277,7 +258,7 @@ module MCPU (
         .OpBSel_ID(OpBSel_ID),
         .ALUCtrl_ID(ALUCtrl_ID),
         .MemCtrl_ID(MemCtrl_ID),
-        .BraCtrl_ID(BraCtrl_ID),
+        .BRACtrl_ID(BRACtrl_ID),
 
         .PC_RN(PC_RN),
         .inst_RN(inst_RN),
@@ -290,7 +271,7 @@ module MCPU (
         .OpBSel_RN(OpBSel_RN),
         .ALUCtrl_RN(ALUCtrl_RN),
         .MemCtrl_RN(MemCtrl_RN),
-        .BraCtrl_RN(BraCtrl_RN)
+        .BRACtrl_RN(BRACtrl_RN)
     );
 
     /**********************RENAMING*********************/
@@ -299,14 +280,14 @@ module MCPU (
         .rst(rst),
         .rollback(RAT_rollback),
         // read operands
-        .raddr1(inst_RO[19:15]),
-        .valid1(RAT_valid1_RO),
-        .rdata1(RAT_rdata1_RO),
-        .ROB_index1_out(ROB_rindex1_RO),
-        .raddr2(inst_RO[24:20]),
-        .valid2(RAT_valid2_RO),
-        .rdata2(RAT_rdata2_RO),
-        .ROB_index2_out(ROB_rindex2_RO),
+        .raddr1(inst_RN[19:15]),
+        .valid1(RAT_valid1_RN),
+        .rdata1(RAT_rdata1_RN),
+        .ROB_index1_out(ROB_rindex1_RN),
+        .raddr2(inst_RN[24:20]),
+        .valid2(RAT_valid2_RN),
+        .rdata2(RAT_rdata2_RN),
+        .ROB_index2_out(ROB_rindex2_RN),
         // register renaming  decode set dest reg
         .dec_we(RegWrite_RN),
         .waddr(inst_RN[11:7]),
@@ -317,28 +298,25 @@ module MCPU (
         .ROB_data_commit(ROB_data_commit),
         .ROB_index_commit(ROB_index_commit2reg)
     );
-    
-    wire [4:0] waddr = inst_RN[11:7];
-    
+
     ROB M_ROB (
         .clk(clk),
         .rst(rst),
-        .rollback(ROB_rollback),
         .full(ROB_full),
         .empty(ROB_empty),
-        .ROB_rindex1(ROB_rindex1_RO),
-        .ROB_rdata1(ROB_rdata1_RO),
-        .ready1(ROB_ready1_RO),
+        .ROB_rindex1(ROB_rindex1_RN),
+        .ROB_rdata1(ROB_rdata1_RN),
+        .ready1(ROB_ready1_RN),
 
-        .ROB_rindex2(ROB_rindex2_RO),
-        .ROB_rdata2(ROB_rdata2_RO),
-        .ready2(ROB_ready2_RO),
+        .ROB_rindex2(ROB_rindex2_RN),
+        .ROB_rdata2(ROB_rdata2_RN),
+        .ready2(ROB_ready2_RN),
         
         // register renaming
         .write_en(ROBWrite_en_RN), // every inst should have an ROB entry
         .pc_in(PC_RN),
         .OpCode_in(OpCode_RN),
-        .waddr_in(waddr),
+        .waddr_in(inst_RN[11:7]),
         .branch_pred_taken(1'd0), //predict not taken
         .ROB_windex(ROB_windex),
 
@@ -367,93 +345,71 @@ module MCPU (
 
     assign ROB_dest_RN = ROB_windex;
 
-    
-    RN_RO M_RN_RO (
+    ImmGen M_ImmGen (
+        .inst(inst_RN),
+        .ImmSel(ImmSel_RN),
+        .imm(Imm_RN)
+    );
+
+    // read operands from Regfile & ROB
+    OperandAManager M_OperandAManager (
+        .OpASel(OpASel_RN),
+        .PC(PC_RN),
+        .RAT_valid(RAT_valid1_RN),
+        .RAT_value(RAT_rdata1_RN),
+        .ROB_ready(ROB_ready1_RN),
+        .ROB_index_in(ROB_rindex1_RN),
+        .ROB_value(ROB_rdata1_RN),
+        .CDB_ALU_ROB_index(CDB_ALU_ROB_index),
+        .CDB_ALU_data(CDB_ALU_data),
+        .CDB_LSQ_ROB_index(CDB_LSQ_ROB_index),
+        .CDB_LSQ_data(CDB_LSQ_data),
+        .CDB_BRA_ROB_index(CDB_BRA_ROB_index),
+        .CDB_BRA_data(CDB_BRA_data),
+        .OpAValue(OpAValue_RN),
+        .ROB_index_out(OpA_ROB_index_RN)
+    );
+
+    OperandBManager M_OperandBManager (
+        .OpBSel(OpBSel_RN),
+        .imm(Imm_RN),
+        .RAT_valid(RAT_valid2_RN),
+        .RAT_value(RAT_rdata2_RN),
+        .ROB_ready(ROB_ready2_RN),
+        .ROB_index_in(ROB_rindex2_RN),
+        .ROB_value(ROB_rdata2_RN),
+        .CDB_ALU_ROB_index(CDB_ALU_ROB_index),
+        .CDB_ALU_data(CDB_ALU_data),
+        .CDB_LSQ_ROB_index(CDB_LSQ_ROB_index),
+        .CDB_LSQ_data(CDB_LSQ_data),
+        .CDB_BRA_ROB_index(CDB_BRA_ROB_index),
+        .CDB_BRA_data(CDB_BRA_data),
+        .OpBValue(OpBValue_RN),
+        .ROB_index_out(OpB_ROB_index_RN)
+    );
+
+    RN_DP M_RN_DP (
         .clk(clk),
         .rst(rst),
-        .EN(RN_RO_EN),
-        .flush(RN_RO_Flush),
+        .EN(ID_RN_EN),
+        .flush(ID_RN_Flush),
         .stall(1'd0),
 
         .PC_RN(PC_RN),
         .inst_RN(inst_RN),
         .OpCode_RN(OpCode_RN),
         .FUType_RN(FUType_RN),
-        .ImmSel_RN(ImmSel_RN),
         .OpASel_RN(OpASel_RN),
         .OpBSel_RN(OpBSel_RN),
         .ROB_dest_RN(ROB_dest_RN),
         .ALUCtrl_RN(ALUCtrl_RN),
         .MemCtrl_RN(MemCtrl_RN),
-        .BraCtrl_RN(BraCtrl_RN),
-
-        .PC_RO(PC_RO),
-        .inst_RO(inst_RO),
-        .OpCode_RO(OpCode_RO),
-        .FUType_RO(FUType_RO),
-        .ImmSel_RO(ImmSel_RO),
-        .OpASel_RO(OpASel_RO),
-        .OpBSel_RO(OpBSel_RO),
-        .ROB_dest_RO(ROB_dest_RO),
-        .ALUCtrl_RO(ALUCtrl_RO),
-        .MemCtrl_RO(MemCtrl_RO),
-        .BraCtrl_RO(BraCtrl_RO)
-    );
-
-    /**********************Read Operands*********************/
-    ImmGen M_ImmGen (
-        .inst(inst_RO),
-        .ImmSel(ImmSel_RO),
-        .imm(Imm_RO)
-    );
-
-    // read operands from Regfile & ROB
-    OperandAManager M_OperandAManager (
-        .OpASel(OpASel_RO),
-        .PC(PC_RO),
-        .RAT_valid(RAT_valid1_RO),
-        .RAT_value(RAT_rdata1_RO),
-        .ROB_ready(ROB_ready1_RO),
-        .ROB_index_in(ROB_rindex1_RO),
-        .ROB_value(ROB_rdata1_RO),
-        .OpAValue(OpAValue_RO),
-        .ROB_index_out(OpA_ROB_index_RO)
-    );
-
-    OperandBManager M_OperandBManager (
-        .OpBSel(OpBSel_RO),
-        .imm(Imm_RO),
-        .RAT_valid(RAT_valid2_RO),
-        .RAT_value(RAT_rdata2_RO),
-        .ROB_ready(ROB_ready2_RO),
-        .ROB_index_in(ROB_rindex2_RO),
-        .ROB_value(ROB_rdata2_RO),
-        .OpBValue(OpBValue_RO),
-        .ROB_index_out(OpB_ROB_index_RO)
-    );
-
-    RO_DP M_RO_DP (
-        .clk(clk),
-        .rst(rst),
-        .EN(RO_DP_EN),
-        .flush(RO_DP_Flush),
-        .stall(1'd0),
-
-        .PC_RO(PC_RO),
-        .inst_RO(inst_RO),
-        .OpCode_RO(OpCode_RO),
-        .FUType_RO(FUType_RO),
-        .OpASel_RO(OpASel_RO),
-        .OpBSel_RO(OpBSel_RO),
-        .ROB_dest_RO(ROB_dest_RO),
-        .ALUCtrl_RO(ALUCtrl_RO),
-        .MemCtrl_RO(MemCtrl_RO),
-        .BraCtrl_RO(BraCtrl_RO),
-        .Imm_RO(Imm_RO),
-        .OpAValue_RO(OpAValue_RO),
-        .OpA_ROB_index_RO(OpA_ROB_index_RO),
-        .OpBValue_RO(OpBValue_RO),
-        .OpB_ROB_index_RO(OpB_ROB_index_RO),
+        .BRACtrl_RN(BRACtrl_RN),
+        .Imm_RN(Imm_RN),
+        .OpAValue_RN(OpAValue_RN),
+        .OpA_ROB_index_RN(OpA_ROB_index_RN),
+        .OpBValue_RN(OpBValue_RN),
+        .OpB_ROB_index_RN(OpB_ROB_index_RN),
 
         .PC_DP(PC_DP),
         .inst_DP(inst_DP),
@@ -464,7 +420,7 @@ module MCPU (
         .ROB_dest_DP(ROB_dest_DP),
         .ALUCtrl_DP(ALUCtrl_DP),
         .MemCtrl_DP(MemCtrl_DP),
-        .BraCtrl_DP(BraCtrl_DP),
+        .BRACtrl_DP(BRACtrl_DP),
         .Imm_DP(Imm_DP),
         .OpAValue_DP(OpAValue_DP),
         .OpA_ROB_index_DP(OpA_ROB_index_DP),
@@ -499,6 +455,8 @@ module MCPU (
         .CDB_ALU_data(CDB_ALU_data),
         .CDB_LSQ_ROB_index(CDB_LSQ_ROB_index),
         .CDB_LSQ_data(CDB_LSQ_data),
+        .CDB_BRA_ROB_index(CDB_BRA_ROB_index),
+        .CDB_BRA_data(CDB_BRA_data),
         .Op_out(ALUOp),
         .Vj_out(ALUSrcA),
         .Vk_out(ALUSrcB),
@@ -523,6 +481,8 @@ module MCPU (
         .CDB_ALU_data(CDB_ALU_data),
         .CDB_LSQ_ROB_index(CDB_LSQ_ROB_index),
         .CDB_LSQ_data(CDB_LSQ_data),
+        .CDB_BRA_ROB_index(CDB_BRA_ROB_index),
+        .CDB_BRA_data(CDB_BRA_data),
         .Op_out(LSQOp),
         .Addr_out(LSQAddr),
         .mem_rd_ready(mem_rd_ready),
@@ -540,7 +500,7 @@ module MCPU (
         .rollback(RSBRA_rollback),
         .full(RSBRA_full),
         .issue_we(RSBRA_we),
-        .Op_in(BraCtrl_DP),
+        .Op_in(BRACtrl_DP),
         .Vj_in(OpAValue_DP),
         .Vk_in(OpBValue_DP),
         .Qj_in(OpA_ROB_index_DP),
@@ -552,6 +512,8 @@ module MCPU (
         .CDB_ALU_data(CDB_ALU_data),
         .CDB_LSQ_ROB_index(CDB_LSQ_ROB_index),
         .CDB_LSQ_data(CDB_LSQ_data),
+        .CDB_BRA_ROB_index(CDB_BRA_ROB_index),
+        .CDB_BRA_data(CDB_BRA_data),
         .func_busy(BRA_busy),
         .Op_out(BRAOp),
         .Vj_out(BRASrcA),
@@ -602,6 +564,7 @@ module MCPU (
         .Dest_val(BRA_Dest_val),
         .Dest_out(BRADest_out)
     );
+
 
     CDB M_CDB (
         .CDB_ALUData_in(ALURes),

@@ -25,6 +25,9 @@ module RSLSQ (
     input [`ROB_ENTRY_WIDTH - 1:0]      CDB_LSQ_ROB_index,
     input [31:0]                        CDB_LSQ_data,
 
+    input [`ROB_ENTRY_WIDTH - 1:0]      CDB_BRA_ROB_index,
+    input [31:0]                        CDB_BRA_data,
+
     // to function unit
     output reg [`LSQ_OP_WIDTH - 1:0]    Op_out,
     output reg [31:0]                   Addr_out,
@@ -162,6 +165,19 @@ module RSLSQ (
                 end
             end
 
+            if(CDB_BRA_ROB_index != 0) begin
+                for(i = 1; i <= `RSLSQ_ENTRY_NUM; i = i + 1) begin
+                    if(CDB_BRA_ROB_index == Qj[i]) begin
+                        Vj[i] <= CDB_BRA_data;
+                        Qj[i] <= 0;
+                    end
+                    if(CDB_BRA_ROB_index == Qk[i]) begin
+                        Vk[i] <= CDB_BRA_data;
+                        Qk[i] <= 0;
+                    end
+                end
+            end
+
             // ROB store commit
             if(ROB_index_commit != 0) begin
                 for(i = 1; i <= `RSLSQ_ENTRY_NUM; i = i + 1) begin
@@ -174,7 +190,7 @@ module RSLSQ (
                     
 
             /*****************allocate entry in lsq*********************/
-            if(issue_we) begin
+            if(issue_we && ~full) begin
                 Op[tail]     <= Op_in;
                 Vj[tail]     <= Vj_in;
                 Vk[tail]     <= Vk_in;
@@ -186,6 +202,41 @@ module RSLSQ (
                 Busy[tail]   <= 1'd1;
                 Addr[tail]   <= (Qj_in == 0) ? (Vj_in + Offset_in) : 32'd0;
                 Status[tail] <= 1'd0;
+
+                if(CDB_ALU_ROB_index == Qj_in && CDB_ALU_ROB_index != 0) begin
+                    Vj[tail] <= CDB_ALU_data;
+                    Qj[tail] <= 0;
+                end
+                else if(CDB_LSQ_ROB_index == Qj_in && CDB_LSQ_ROB_index != 0) begin
+                    Vj[tail] <= CDB_LSQ_data;
+                    Qj[tail] <= 0;
+                end
+                else if(CDB_BRA_ROB_index == Qj_in && CDB_BRA_ROB_index != 0) begin
+                    Vj[tail] <= CDB_BRA_data;
+                    Qj[tail] <= 0;
+                end
+                else begin
+                    Vj[tail] <= Vj_in;
+                    Qj[tail] <= Qj_in;
+                end
+
+                if(CDB_ALU_ROB_index == Qk_in && CDB_ALU_ROB_index != 0) begin
+                    Vk[tail] <= CDB_ALU_data;
+                    Qk[tail] <= 0;
+                end
+                else if(CDB_LSQ_ROB_index == Qk_in && CDB_LSQ_ROB_index != 0) begin
+                    Vk[tail] <= CDB_LSQ_data;
+                    Qk[tail] <= 0;
+                end
+                else if(CDB_BRA_ROB_index == Qk_in && CDB_BRA_ROB_index != 0) begin
+                    Vk[tail] <= CDB_BRA_data;
+                    Qk[tail] <= 0;
+                end
+                else begin
+                    Vk[tail] <= Vk_in;
+                    Qk[tail] <= Qk_in;
+                end
+
 
                 tail         <= (tail == `RSLSQ_ENTRY_NUM) ? 1 : tail + 1;
                 counter_plus <= 1'd1;

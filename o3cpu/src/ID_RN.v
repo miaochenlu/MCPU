@@ -18,7 +18,7 @@ module ID_RN(
     input [ 1:0]        OpBSel_ID,
     input [ 3:0]        ALUCtrl_ID,
     input [ 3:0]        MemCtrl_ID,
-    input [ 3:0]        BraCtrl_ID,
+    input [ 3:0]        BRACtrl_ID,
     
     output reg [31:0]   PC_RN,
     output reg [31:0]   inst_RN,
@@ -31,7 +31,7 @@ module ID_RN(
     output reg [ 1:0]   OpBSel_RN,
     output reg [ 3:0]   ALUCtrl_RN,
     output reg [ 3:0]   MemCtrl_RN,
-    output reg [ 3:0]   BraCtrl_RN
+    output reg [ 3:0]   BRACtrl_RN
 );
 
     always @(posedge clk) begin
@@ -47,7 +47,7 @@ module ID_RN(
             OpBSel_RN <= 0;
             ALUCtrl_RN <= 0;
             MemCtrl_RN <= 0;
-            BraCtrl_RN <= 0;
+            BRACtrl_RN <= 0;
         end
         else if(EN) begin
             if(stall) begin
@@ -62,7 +62,7 @@ module ID_RN(
                 OpBSel_RN <= OpBSel_RN;
                 ALUCtrl_RN <= ALUCtrl_RN;
                 MemCtrl_RN <= MemCtrl_RN;
-                BraCtrl_RN <= BraCtrl_RN;
+                BRACtrl_RN <= BRACtrl_RN;
             end
             else if(flush) begin
                 PC_RN   <= PC_RN;
@@ -76,7 +76,7 @@ module ID_RN(
                 OpBSel_RN <= 0;
                 ALUCtrl_RN <= 0;
                 MemCtrl_RN <= 0;
-                BraCtrl_RN <= 0;
+                BRACtrl_RN <= 0;
             end
             else begin
                 PC_RN   <= PC_ID;
@@ -90,7 +90,7 @@ module ID_RN(
                 OpBSel_RN <= OpBSel_ID;
                 ALUCtrl_RN <= ALUCtrl_ID;
                 MemCtrl_RN <= MemCtrl_ID;
-                BraCtrl_RN <= BraCtrl_ID;
+                BRACtrl_RN <= BRACtrl_ID;
             end
         end
         else begin
@@ -105,7 +105,7 @@ module ID_RN(
             OpBSel_RN <= OpBSel_RN;
             ALUCtrl_RN <= ALUCtrl_RN;
             MemCtrl_RN <= MemCtrl_RN;
-            BraCtrl_RN <= BraCtrl_RN;
+            BRACtrl_RN <= BRACtrl_RN;
         end
     end
 endmodule

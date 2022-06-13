@@ -25,6 +25,9 @@ module RSBRA (
     input [`ROB_ENTRY_WIDTH - 1:0]      CDB_LSQ_ROB_index,
     input [31:0]                        CDB_LSQ_data,
 
+    input [`ROB_ENTRY_WIDTH - 1:0]      CDB_BRA_ROB_index,
+    input [31:0]                        CDB_BRA_data,
+
     // from func unit: is it busy
     input                               func_busy,
     // to func unit
@@ -125,6 +128,19 @@ module RSBRA (
                 end
             end
 
+            if(CDB_BRA_ROB_index != 0) begin
+                for(i = 1; i <= `RSBRA_ENTRY_NUM; i = i + 1) begin
+                    if(CDB_BRA_ROB_index == Qj[i]) begin
+                        Vj[i] <= CDB_BRA_data;
+                        Qj[i] <= 0;
+                    end
+                    if(CDB_BRA_ROB_index == Qk[i]) begin
+                        Vk[i] <= CDB_BRA_data;
+                        Qk[i] <= 0;
+                    end
+                end
+            end
+
             if(ExeRS_index != 0 && ~func_busy) begin
                 Op_out              <= Op[ExeRS_index];
                 Vj_out              <= Vj[ExeRS_index];
@@ -136,7 +152,7 @@ module RSBRA (
                 Busy[ExeRS_index]   <= 1'd0;
             end
 
-            if(issue_we) begin
+            if(issue_we && ~full) begin
                 Op[AllocRS_index]       <= Op_in;
                 Vj[AllocRS_index]       <= Vj_in;
                 Vk[AllocRS_index]       <= Vk_in;
@@ -146,6 +162,40 @@ module RSBRA (
                 Offset[AllocRS_index]   <= Offset_in;
                 Dest[AllocRS_index]     <= Dest_in;
                 Busy[AllocRS_index]     <= 1'd1;
+
+                if(CDB_ALU_ROB_index == Qj_in && CDB_ALU_ROB_index != 0) begin
+                    Vj[AllocRS_index] <= CDB_ALU_data;
+                    Qj[AllocRS_index] <= 0;
+                end
+                else if(CDB_LSQ_ROB_index == Qj_in && CDB_LSQ_ROB_index != 0) begin
+                    Vj[AllocRS_index] <= CDB_LSQ_data;
+                    Qj[AllocRS_index] <= 0;
+                end
+                else if(CDB_BRA_ROB_index == Qj_in && CDB_BRA_ROB_index != 0) begin
+                    Vj[AllocRS_index] <= CDB_BRA_data;
+                    Qj[AllocRS_index] <= 0;
+                end
+                else begin
+                    Vj[AllocRS_index] <= Vj_in;
+                    Qj[AllocRS_index] <= Qj_in;
+                end
+
+                if(CDB_ALU_ROB_index == Qk_in && CDB_ALU_ROB_index != 0) begin
+                    Vk[AllocRS_index] <= CDB_ALU_data;
+                    Qk[AllocRS_index] <= 0;
+                end
+                else if(CDB_LSQ_ROB_index == Qk_in && CDB_LSQ_ROB_index != 0) begin
+                    Vk[AllocRS_index] <= CDB_LSQ_data;
+                    Qk[AllocRS_index] <= 0;
+                end
+                else if(CDB_BRA_ROB_index == Qk_in && CDB_BRA_ROB_index != 0) begin
+                    Vk[AllocRS_index] <= CDB_BRA_data;
+                    Qk[AllocRS_index] <= 0;
+                end
+                else begin
+                    Vk[AllocRS_index] <= Vk_in;
+                    Qk[AllocRS_index] <= Qk_in;
+                end
             end
         end
     end

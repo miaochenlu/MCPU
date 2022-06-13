@@ -18,7 +18,7 @@ module RN_RO(
     input [`ROB_ENTRY_WIDTH - 1:0] ROB_dest_RN,
     input [ 3:0]        ALUCtrl_RN,
     input [ 3:0]        MemCtrl_RN,
-    input [ 3:0]        BraCtrl_RN,
+    input [ 3:0]        BRACtrl_RN,
     
     output reg [31:0]   PC_RO,
     output reg [31:0]   inst_RO,
@@ -31,7 +31,7 @@ module RN_RO(
     output reg [`ROB_ENTRY_WIDTH - 1:0] ROB_dest_RO,
     output reg [ 3:0]   ALUCtrl_RO,
     output reg [ 3:0]   MemCtrl_RO,
-    output reg [ 3:0]   BraCtrl_RO
+    output reg [ 3:0]   BRACtrl_RO
 );
 
     always @(posedge clk) begin
@@ -47,7 +47,7 @@ module RN_RO(
             ROB_dest_RO <= 0;
             ALUCtrl_RO <= 0;
             MemCtrl_RO <= 0;
-            BraCtrl_RO <= 0;
+            BRACtrl_RO <= 0;
         end
         else if(EN) begin
             if(stall) begin
@@ -62,7 +62,7 @@ module RN_RO(
                 ROB_dest_RO <= ROB_dest_RO;
                 ALUCtrl_RO <= ALUCtrl_RO;
                 MemCtrl_RO <= MemCtrl_RO;
-                BraCtrl_RO <= BraCtrl_RO;
+                BRACtrl_RO <= BRACtrl_RO;
             end
             else if(flush) begin
                 PC_RO   <= PC_RO;
@@ -76,7 +76,7 @@ module RN_RO(
                 ROB_dest_RO <= 0;
                 ALUCtrl_RO <= 0;
                 MemCtrl_RO <= 0;
-                BraCtrl_RO <= 0;
+                BRACtrl_RO <= 0;
             end
             else begin
                 PC_RO   <= PC_RN;
@@ -89,7 +89,7 @@ module RN_RO(
                 ROB_dest_RO <= ROB_dest_RN;
                 ALUCtrl_RO <= ALUCtrl_RN;
                 MemCtrl_RO <= MemCtrl_RN;
-                BraCtrl_RO <= BraCtrl_RN;
+                BRACtrl_RO <= BRACtrl_RN;
             end
         end
         else begin
@@ -104,7 +104,7 @@ module RN_RO(
             ROB_dest_RO <= ROB_dest_RO;
             ALUCtrl_RO <= ALUCtrl_RO;
             MemCtrl_RO <= MemCtrl_RO;
-            BraCtrl_RO <= BraCtrl_RO;
+            BRACtrl_RO <= BRACtrl_RO;
         end
     end
 endmodule

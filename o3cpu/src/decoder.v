@@ -19,7 +19,7 @@ module Decoder(
     output [`LSQ_OP_WIDTH - 1:0] MemCtrl,
 
     // branch unit
-    output [`BRA_OP_WIDTH - 1:0] BraCtrl
+    output [`BRA_OP_WIDTH - 1:0] BRACtrl
 );
     
     wire            IsValidInst;
@@ -141,7 +141,7 @@ module Decoder(
                    | ({4{is_sw}}  & `SW);                  
     
     
-    assign BraCtrl = ({4{is_beq}}  & `BEQ)
+    assign BRACtrl = ({4{is_beq}}  & `BEQ)
                    | ({4{is_bne}}  & `BNE)
                    | ({4{is_blt}}  & `BLT)
                    | ({4{is_bge}}  & `BGE)

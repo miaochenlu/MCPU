@@ -14,7 +14,6 @@ module OperandBManager(
 
     output reg [31:0]                   OpBValue,
     output reg [`ROB_ENTRY_WIDTH - 1:0] ROB_index_out
-
 );
 
     always @(*) begin
@@ -22,7 +21,7 @@ module OperandBManager(
             OpBValue      = 0;
             ROB_index_out = 0;
         end
-        else if(OpBSel == 2'd1)
+        else if(OpBSel == 2'd1) begin
             OpBValue      = imm;
             ROB_index_out = 0;
         end

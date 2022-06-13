@@ -2,8 +2,9 @@
 `include "defines.vh"
 
 module RSALU (
-    input clk,
-    input rst,
+    input  clk,
+    input  rst,
+    input  rollback,
     output full,
 
     // issue in
@@ -71,7 +72,7 @@ module RSALU (
         Vk_out   <= 0;
         Dest_out <= 0;
         
-        if(rst) begin
+        if(rst || rollback) begin
             for(i = 0; i <= `RSALU_ENTRY_NUM; i = i + 1) begin
                 Busy[i] <= 1'd0;
                 Op[i]   <= 0;

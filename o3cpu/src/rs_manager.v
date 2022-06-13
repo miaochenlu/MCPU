@@ -7,7 +7,7 @@ module RSManager (
     output RSLSQ_we
 );
 
-    assign RSALU_we = (FUType == FU_ALU) ? 1'd1 : 1'd0;
-    assign RSBRA_we = (FUType == FU_BRA) ? 1'd1 : 1'd0;
-    assign RSLSQ_we = (FUType == FU_LSQ) ? 1'd1 : 1'd0;
+    assign RSALU_we = (FUType == `FU_ALU) ? 1'd1 : 1'd0;
+    assign RSBRA_we = (FUType == `FU_BRA) ? 1'd1 : 1'd0;
+    assign RSLSQ_we = (FUType == `FU_LSQ) ? 1'd1 : 1'd0;
 endmodule

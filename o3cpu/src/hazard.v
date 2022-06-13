@@ -9,30 +9,36 @@ module HazardUnit(
     input       RSBRA_full,
     input       MisPredict,
 
-    output reg  stall,
-    output reg  flush
+    output      PC_EN_IF,
+    output      IF_ID_Stall,
+    output      IF_ID_Flush,
+    output      ID_RN_Flush,
+    output      RN_DP_Flush,
+    output      ROB_rollback,
+    output      RAT_rollback,
+    output      RSLSQ_rollback,
+    output      RSALU_rollback,
+    output      RSBRA_rollback
 );
 
-    always @(*) begin
-        if(MisPredict) 
-            flush = 1'd1
-        else 
-            flush = 1'd0;
+    wire ControlStall = ROB_full
+                      | (FUType == `FU_ALU && RSALU_full)
+                      | (FUType == `FU_LSQ && RSLSQ_full)
+                      | (FUType == `FU_BRA && RSBRA_full);
 
-        if(ROB_full) begin
-            stall = 1'd1;
-        end
-        else if(FUType == `FU_ALU && RSALU_full) begin
-            stall = 1'd1;
-        end
-        else if(FUType == `FU_LSQ && RSLSQ_full) begin
-            stall = 1'd1;
-        end
-        else if(FUType == `FU_BRA && RSBRA_full) begin
-            stall = 1'd1;
-        end
-        else 
-            stall = 1'd0;
-    end
+
+    assign PC_EN_IF       = ~ControlStall;
+    assign IF_ID_Stall    = ControlStall;
+    assign IF_ID_Flush    = MisPredict;
+
+    assign ROB_rollback   = MisPredict;
+    assign RAT_rollback   = MisPredict;
+    assign RSLSQ_rollback = MisPredict;
+    assign RSALU_rollback = MisPredict;
+    assign RSBRA_rollback = MisPredict;
+
+    assign ID_RN_Flush    = MisPredict | ControlStall;
+    assign RN_DP_Flush    = MisPredict | ControlStall;
+
 
 endmodule

@@ -5,82 +5,81 @@ module Decoder(
     input [31:0] inst,
     // which fuction unit
     output [2:0] FUType,
-    output [6:0] opcode;
+    output [6:0] OpCode,
     output       RegWrite,
     output [3:0] ImmSel,
     output [1:0] OpASel,
     output [1:0] OpBSel,
 
     // ALU function unit
-    output [3:0] ALUCtrl,
+    output [`ALU_OP_WIDTH - 1:0] ALUCtrl,
 
     // load store function unit
-    output [3:0] MemCtrl,
+    output [`LSQ_OP_WIDTH - 1:0] MemCtrl,
 
     // branch unit
-    output [3:0] BrCtrl,
+    output [`BRA_OP_WIDTH - 1:0] BraCtrl
 );
  
-    wire    [6:0]   opcode;
     wire    [2:0]   funct3;
     wire    [6:0]   funct7;
     
-    assign  opcode  = inst[6:0];
+    assign  OpCode  = inst[6:0];
     assign  funct7  = inst[31:25];
     assign  funct3  = inst[14:12];
     
     // R type insts
-    wire  is_add  = (opcode == `R_OP) && (funct3 ==3'h0) && (funct7 == 7'h00);
-    wire  is_sub  = (opcode == `R_OP) && (funct3 ==3'h0) && (funct7 == 7'h20);
-    wire  is_sll  = (opcode == `R_OP) && (funct3 ==3'h1) && (funct7 == 7'h00);
-    wire  is_slt  = (opcode == `R_OP) && (funct3 ==3'h2) && (funct7 == 7'h00);
-    wire  is_sltu = (opcode == `R_OP) && (funct3 ==3'h3) && (funct7 == 7'h00);
-    wire  is_xor  = (opcode == `R_OP) && (funct3 ==3'h4) && (funct7 == 7'h00);
-    wire  is_srl  = (opcode == `R_OP) && (funct3 ==3'h5) && (funct7 == 7'h00);
-    wire  is_sra  = (opcode == `R_OP) && (funct3 ==3'h5) && (funct7 == 7'h20);
-    wire  is_or   = (opcode == `R_OP) && (funct3 ==3'h6) && (funct7 == 7'h00);
-    wire  is_and  = (opcode == `R_OP) && (funct3 ==3'h7) && (funct7 == 7'h00);
+    wire  is_add  = (OpCode == `R_OP) && (funct3 ==3'h0) && (funct7 == 7'h00);
+    wire  is_sub  = (OpCode == `R_OP) && (funct3 ==3'h0) && (funct7 == 7'h20);
+    wire  is_sll  = (OpCode == `R_OP) && (funct3 ==3'h1) && (funct7 == 7'h00);
+    wire  is_slt  = (OpCode == `R_OP) && (funct3 ==3'h2) && (funct7 == 7'h00);
+    wire  is_sltu = (OpCode == `R_OP) && (funct3 ==3'h3) && (funct7 == 7'h00);
+    wire  is_xor  = (OpCode == `R_OP) && (funct3 ==3'h4) && (funct7 == 7'h00);
+    wire  is_srl  = (OpCode == `R_OP) && (funct3 ==3'h5) && (funct7 == 7'h00);
+    wire  is_sra  = (OpCode == `R_OP) && (funct3 ==3'h5) && (funct7 == 7'h20);
+    wire  is_or   = (OpCode == `R_OP) && (funct3 ==3'h6) && (funct7 == 7'h00);
+    wire  is_and  = (OpCode == `R_OP) && (funct3 ==3'h7) && (funct7 == 7'h00);
     
     // I MEM type insts
-    wire  is_lb   = (opcode == `I_MEM_OP) && (funct3 ==3'h0) ;
-    wire  is_lh   = (opcode == `I_MEM_OP) && (funct3 ==3'h1) ;
-    wire  is_lw   = (opcode == `I_MEM_OP) && (funct3 ==3'h2) ;
-    wire  is_lbu  = (opcode == `I_MEM_OP) && (funct3 ==3'h4) ;
-    wire  is_lhu  = (opcode == `I_MEM_OP) && (funct3 ==3'h5) ;
+    wire  is_lb   = (OpCode == `I_MEM_OP) && (funct3 ==3'h0) ;
+    wire  is_lh   = (OpCode == `I_MEM_OP) && (funct3 ==3'h1) ;
+    wire  is_lw   = (OpCode == `I_MEM_OP) && (funct3 ==3'h2) ;
+    wire  is_lbu  = (OpCode == `I_MEM_OP) && (funct3 ==3'h4) ;
+    wire  is_lhu  = (OpCode == `I_MEM_OP) && (funct3 ==3'h5) ;
     
     // I Logic type insts    
-    wire  is_addi = (opcode == `I_LOGIC_OP) && (funct3 ==3'h0) ;
-    wire  is_slti = (opcode == `I_LOGIC_OP) && (funct3 ==3'h2) ;
-    wire  is_sltiu= (opcode == `I_LOGIC_OP) && (funct3 ==3'h3) ;
-    wire  is_xori = (opcode == `I_LOGIC_OP) && (funct3 ==3'h4) ;
-    wire  is_ori  = (opcode == `I_LOGIC_OP) && (funct3 ==3'h6) ;
-    wire  is_andi = (opcode == `I_LOGIC_OP) && (funct3 ==3'h7) ;
-    wire  is_slli = (opcode == `I_LOGIC_OP) && (funct3 ==3'h1) && (funct7 == 7'h00);
-    wire  is_srli = (opcode == `I_LOGIC_OP) && (funct3 ==3'h5) && (funct7 == 7'h00);
-    wire  is_srai = (opcode == `I_LOGIC_OP) && (funct3 ==3'h5) && (funct7 == 7'h20);
+    wire  is_addi = (OpCode == `I_LOGIC_OP) && (funct3 ==3'h0) ;
+    wire  is_slti = (OpCode == `I_LOGIC_OP) && (funct3 ==3'h2) ;
+    wire  is_sltiu= (OpCode == `I_LOGIC_OP) && (funct3 ==3'h3) ;
+    wire  is_xori = (OpCode == `I_LOGIC_OP) && (funct3 ==3'h4) ;
+    wire  is_ori  = (OpCode == `I_LOGIC_OP) && (funct3 ==3'h6) ;
+    wire  is_andi = (OpCode == `I_LOGIC_OP) && (funct3 ==3'h7) ;
+    wire  is_slli = (OpCode == `I_LOGIC_OP) && (funct3 ==3'h1) && (funct7 == 7'h00);
+    wire  is_srli = (OpCode == `I_LOGIC_OP) && (funct3 ==3'h5) && (funct7 == 7'h00);
+    wire  is_srai = (OpCode == `I_LOGIC_OP) && (funct3 ==3'h5) && (funct7 == 7'h20);
     
     // I JALR inst
-    wire  is_jalr = (opcode == `I_JALR_OP) && (funct3 ==3'h0) ;
+    wire  is_jalr = (OpCode == `I_JALR_OP) && (funct3 ==3'h0) ;
     
     // S type insts    
-    wire  is_sb   = (opcode == `S_OP) && (funct3 ==3'h0) ;
-    wire  is_sh   = (opcode == `S_OP) && (funct3 ==3'h1) ;
-    wire  is_sw   = (opcode == `S_OP) && (funct3 ==3'h2) ;
+    wire  is_sb   = (OpCode == `S_OP) && (funct3 ==3'h0) ;
+    wire  is_sh   = (OpCode == `S_OP) && (funct3 ==3'h1) ;
+    wire  is_sw   = (OpCode == `S_OP) && (funct3 ==3'h2) ;
     
     // B type insts
-    wire  is_beq  = (opcode == `B_OP) && (funct3 ==3'h0) ;
-    wire  is_bne  = (opcode == `B_OP) && (funct3 ==3'h1) ;
-    wire  is_blt  = (opcode == `B_OP) && (funct3 ==3'h4) ;
-    wire  is_bge  = (opcode == `B_OP) && (funct3 ==3'h5) ;
-    wire  is_bltu = (opcode == `B_OP) && (funct3 ==3'h6) ;
-    wire  is_bgeu = (opcode == `B_OP) && (funct3 ==3'h7) ;
+    wire  is_beq  = (OpCode == `B_OP) && (funct3 ==3'h0) ;
+    wire  is_bne  = (OpCode == `B_OP) && (funct3 ==3'h1) ;
+    wire  is_blt  = (OpCode == `B_OP) && (funct3 ==3'h4) ;
+    wire  is_bge  = (OpCode == `B_OP) && (funct3 ==3'h5) ;
+    wire  is_bltu = (OpCode == `B_OP) && (funct3 ==3'h6) ;
+    wire  is_bgeu = (OpCode == `B_OP) && (funct3 ==3'h7) ;
 
     // U type insts    
-    wire  is_lui  = (opcode == `U_LUI_OP) ;
-    wire  is_auipc= (opcode == `U_AUIPC_OP) ;
+    wire  is_lui  = (OpCode == `U_LUI_OP) ;
+    wire  is_auipc= (OpCode == `U_AUIPC_OP) ;
     
     // J type inst
-    wire  is_jal  = (opcode == `J_OP) ;
+    wire  is_jal  = (OpCode == `J_OP) ;
     
 /*------------------------------------------------------------------------------------*/    
     wire is_R_type = is_add | is_sub | is_sll | is_slt | is_sltu | is_xor
@@ -115,8 +114,8 @@ module Decoder(
     assign OpASel = ({2{is_auipc}} & 2'b01)
                   | ({2{is_R_type | is_I_MEM_type | is_I_LOGIC_type | is_S_type}} & 2'b10);
                          // 0 for pc; 1 for reg
-    assign OpBSel = (2{is_I_LOGIC_type} & 2'b01)
-                  | (2{is_R_type} & 2'b10); // 2 for reg; 1 for imm
+    assign OpBSel = ({2{is_I_LOGIC_type}} & 2'b01)
+                  | ({2{is_R_type}} & 2'b10); // 2 for reg; 1 for imm
     
     assign ALUCtrl = {4{is_add | is_addi | is_I_MEM_type | is_S_type | is_auipc}} & `ADD
                    | {4{is_sub}} & `SUB
@@ -140,13 +139,13 @@ module Decoder(
                    | ({4{is_sw}}  & `SW);                  
     
     
-    assign BrCtrl = ({4{is_beq}}  & `BEQ)
-                  | ({4{is_bne}}  & `BNE)
-                  | ({4{is_blt}}  & `BLT)
-                  | ({4{is_bge}}  & `BGE)
-                  | ({4{is_bltu}} & `BLTU)
-                  | ({4{is_bgeu}} & `BGEU)
-                  | ({4{is_jal }} & `JAL)
-                  | ({4{is_jalr}} & `JALR);
+    assign BraCtrl = ({4{is_beq}}  & `BEQ)
+                   | ({4{is_bne}}  & `BNE)
+                   | ({4{is_blt}}  & `BLT)
+                   | ({4{is_bge}}  & `BGE)
+                   | ({4{is_bltu}} & `BLTU)
+                   | ({4{is_bgeu}} & `BGEU)
+                   | ({4{is_jal }} & `JAL)
+                   | ({4{is_jalr}} & `JALR);
     
 endmodule

@@ -22,14 +22,14 @@ module CDB (
     output                          CDB_BRAJump_en_out,
     output [31:0]                   CDB_BRAJumpAddr_out,    
     output [31:0]                   CDB_BRAData_out,
-    output [`ROB_ENTRY_WIDTH - 1:0] CDB_BRADest_out,   
+    output [`ROB_ENTRY_WIDTH - 1:0] CDB_BRADest_out
 );
 
     assign CDB_ALUData_out            = CDB_ALUData_in;
     assign CDB_ALUDest_out            = CDB_ALUDest_in;
 
-    assign CDB_LSQData_out            = CDB_LSQData_in
-    assign CDB_LSQDest_out            = CDB_LSQDest_in
+    assign CDB_LSQData_out            = CDB_LSQData_in;
+    assign CDB_LSQDest_out            = CDB_LSQDest_in;
 
     assign CDB_BRAJump_en_out         = CDB_BRAJump_en_in;
     assign CDB_BRAJumpAddr_out        = CDB_BRAJumpAddr_in;

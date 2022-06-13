@@ -76,6 +76,8 @@ module RSLSQ (
         Op_out      <= 0;
         Addr_out    <= 32'd0;
         mem_wr_data <= 32'd0;
+        rd_data     <= 32'd0;
+        Dest_out    <= 0;
 
         if(rst) begin
             for(i = 0; i <= `RSLSQ_ENTRY_NUM; i = i + 1) begin

@@ -1,22 +1,25 @@
-Date : 2022-06-01 21:59:08
+Date : 2022-06-12 21:17:11
 Directory : c:\Users\Dell 7080\Desktop\Coding\MCPU
-Total : 55 files,  2594 codes, 93 comments, 421 blanks, all 3108 lines
+Total : 83 files,  4530 codes, 251 comments, 724 blanks, all 5505 lines
 
 Languages
 +----------+------------+------------+------------+------------+------------+
 | language | files      | code       | comment    | blank      | total      |
 +----------+------------+------------+------------+------------+------------+
-| Verilog  |         55 |      2,594 |         93 |        421 |      3,108 |
+| Verilog  |         83 |      4,530 |        251 |        724 |      5,505 |
 +----------+------------+------------+------------+------------+------------+
 
 Directories
 +----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
 | path                                                                       | files      | code       | comment    | blank      | total      |
 +----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
-| .                                                                          |         55 |      2,594 |         93 |        421 |      3,108 |
+| .                                                                          |         83 |      4,530 |        251 |        724 |      5,505 |
 | cache                                                                      |         10 |        776 |         31 |        105 |        912 |
 | cache\sim                                                                  |          3 |        174 |          5 |         28 |        207 |
 | cache\src                                                                  |          7 |        602 |         26 |         77 |        705 |
+| o3cpu                                                                      |         28 |      1,936 |        158 |        303 |      2,397 |
+| o3cpu\sim                                                                  |          3 |        323 |          0 |         37 |        360 |
+| o3cpu\src                                                                  |         25 |      1,613 |        158 |        266 |      2,037 |
 | pipeline_cpu                                                               |         26 |      1,226 |         47 |        187 |      1,460 |
 | pipeline_cpu\sim                                                           |          8 |        175 |         13 |         42 |        230 |
 | pipeline_cpu\src                                                           |         18 |      1,051 |         34 |        145 |      1,230 |
@@ -39,6 +42,34 @@ Files
 | c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\defines.vh                | Verilog  |          9 |          0 |          2 |         11 |
 | c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\mem_hier.v                | Verilog  |         55 |          0 |          5 |         60 |
 | c:\Users\Dell 7080\Desktop\Coding\MCPU\cache\src\memory.v                  | Verilog  |         35 |          0 |          6 |         41 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\sim\rs_alu_tb.v               | Verilog  |        108 |          0 |         12 |        120 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\sim\rs_bra_tb.v               | Verilog  |        101 |          0 |         12 |        113 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\sim\rs_lsq_tb.v               | Verilog  |        114 |          0 |         13 |        127 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\IF_ID.v                   | Verilog  |         37 |          0 |          6 |         43 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\IF_IS.v                   | Verilog  |         37 |          0 |          5 |         42 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\alu.v                     | Verilog  |         44 |          1 |          8 |         53 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\bra.v                     | Verilog  |         84 |          0 |          5 |         89 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\cdb.v                     | Verilog  |         29 |          3 |          7 |         39 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\decoder.v                 | Verilog  |        111 |         17 |         24 |        152 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\defines.vh                | Verilog  |         58 |          0 |         11 |         69 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\hazard.v                  | Verilog  |         33 |          0 |          5 |         38 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\imm_gen.v                 | Verilog  |         13 |          0 |          2 |         15 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\issue_queue.v             | Verilog  |          0 |         60 |         13 |         73 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\lsq.v                     | Verilog  |         19 |          0 |          4 |         23 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\mcpu.v                    | Verilog  |        297 |         17 |         41 |        355 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\mux21_32.v                | Verilog  |          9 |          0 |          3 |         12 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\mux41_32.v                | Verilog  |         14 |          0 |          3 |         17 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\operandA_manager.v        | Verilog  |         38 |          2 |          4 |         44 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\operandB_manager.v        | Verilog  |         38 |          2 |          5 |         45 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\pc.v                      | Verilog  |         19 |          0 |          2 |         21 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\ram.v                     | Verilog  |         51 |          0 |          5 |         56 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\rat.v                     | Verilog  |         61 |          8 |         10 |         79 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\reorder_buffer.v          | Verilog  |        175 |         13 |         28 |        216 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\rom.v                     | Verilog  |         11 |          0 |          3 |         14 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\rs_alu.v                  | Verilog  |        107 |          8 |         21 |        136 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\rs_bra.v                  | Verilog  |        122 |          8 |         22 |        152 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\rs_lsq.v                  | Verilog  |        194 |         19 |         28 |        241 |
+| c:\Users\Dell 7080\Desktop\Coding\MCPU\o3cpu\src\rs_manager.v              | Verilog  |         12 |          0 |          1 |         13 |
 | c:\Users\Dell 7080\Desktop\Coding\MCPU\pipeline_cpu\sim\IF_ID_tb.v         | Verilog  |         27 |          9 |          7 |         43 |
 | c:\Users\Dell 7080\Desktop\Coding\MCPU\pipeline_cpu\sim\alu_tb.v           | Verilog  |         26 |          4 |          6 |         36 |
 | c:\Users\Dell 7080\Desktop\Coding\MCPU\pipeline_cpu\sim\ctrl_unit_tb.v     | Verilog  |         21 |          0 |          3 |         24 |
@@ -84,5 +115,5 @@ Files
 | c:\Users\Dell 7080\Desktop\Coding\MCPU\single_cycle_cpu\src\ram.v          | Verilog  |         47 |          0 |          6 |         53 |
 | c:\Users\Dell 7080\Desktop\Coding\MCPU\single_cycle_cpu\src\regfile.v      | Verilog  |         27 |          0 |          7 |         34 |
 | c:\Users\Dell 7080\Desktop\Coding\MCPU\single_cycle_cpu\src\rom.v          | Verilog  |         11 |          0 |          4 |         15 |
-| Total                                                                      |          |      2,594 |         93 |        421 |      3,108 |
+| Total                                                                      |          |      4,530 |        251 |        724 |      5,505 |
 +----------------------------------------------------------------------------+----------+------------+------------+------------+------------+

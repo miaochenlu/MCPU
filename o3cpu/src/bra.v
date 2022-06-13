@@ -13,7 +13,7 @@ module BRA(
     output reg res_ready,
     output reg Jump_en,
     output reg [31:0] JumpAddr,
-    output reg [`ROB_ENTRY_WIDTH - 1:0] Dest_val,
+    output reg [31:0] Dest_val,
     output reg [`ROB_ENTRY_WIDTH - 1:0] Dest_out
 );
     always @(*) begin

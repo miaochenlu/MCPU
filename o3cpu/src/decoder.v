@@ -7,6 +7,7 @@ module Decoder(
     output [2:0] FUType,
     output [6:0] OpCode,
     output       RegWrite,
+    output       ROBWrite_en,
     output [3:0] ImmSel,
     output [1:0] OpASel,
     output [1:0] OpBSel,
@@ -20,7 +21,8 @@ module Decoder(
     // branch unit
     output [`BRA_OP_WIDTH - 1:0] BraCtrl
 );
- 
+    
+    wire            IsValidInst;
     wire    [2:0]   funct3;
     wire    [6:0]   funct7;
     
@@ -147,5 +149,8 @@ module Decoder(
                    | ({4{is_bgeu}} & `BGEU)
                    | ({4{is_jal }} & `JAL)
                    | ({4{is_jalr}} & `JALR);
+    
+    assign IsValidInst = is_R_type | is_I_type | is_S_type | is_B_type | is_J_type | is_U_type;
+    assign ROBWrite_en = IsValidInst;
     
 endmodule

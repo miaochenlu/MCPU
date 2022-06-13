@@ -12,6 +12,7 @@ module ID_RN(
     input [6:0]         OpCode_ID,
     input [ 2:0]        FUType_ID,
     input               RegWrite_ID,
+    input               ROBWrite_en_ID,
     input [ 3:0]        ImmSel_ID,
     input [ 1:0]        OpASel_ID,
     input [ 1:0]        OpBSel_ID,
@@ -24,6 +25,7 @@ module ID_RN(
     output reg [6:0]    OpCode_RN,
     output reg [ 2:0]   FUType_RN,
     output reg          RegWrite_RN,
+    output reg          ROBWrite_en_RN,
     output reg [ 3:0]   ImmSel_RN,
     output reg [ 1:0]   OpASel_RN,
     output reg [ 1:0]   OpBSel_RN,
@@ -39,6 +41,7 @@ module ID_RN(
             OpCode_RN <= 0;
             FUType_RN <= 0;
             RegWrite_RN <= 0;
+            ROBWrite_en_RN <= 0;
             ImmSel_RN <= 0;
             OpASel_RN <= 0;
             OpBSel_RN <= 0;
@@ -53,6 +56,7 @@ module ID_RN(
                 OpCode_RN <= OpCode_RN;
                 FUType_RN <= FUType_RN;
                 RegWrite_RN <= RegWrite_RN;
+                ROBWrite_en_RN <= ROBWrite_en_RN;
                 ImmSel_RN <= ImmSel_RN;
                 OpASel_RN <= OpASel_RN;
                 OpBSel_RN <= OpBSel_RN;
@@ -66,6 +70,7 @@ module ID_RN(
                 OpCode_RN <= 0;
                 FUType_RN <= 0;
                 RegWrite_RN <= 0;
+                ROBWrite_en_RN <= 0;
                 ImmSel_RN <= 0;
                 OpASel_RN <= 0;
                 OpBSel_RN <= 0;
@@ -79,6 +84,7 @@ module ID_RN(
                 OpCode_RN <= OpCode_ID;
                 FUType_RN <= FUType_ID;
                 RegWrite_RN <= RegWrite_ID;
+                ROBWrite_en_RN <= ROBWrite_en_ID;
                 ImmSel_RN <= ImmSel_ID;
                 OpASel_RN <= OpASel_ID;
                 OpBSel_RN <= OpBSel_ID;
@@ -93,6 +99,7 @@ module ID_RN(
             OpCode_RN <= OpCode_RN;
             FUType_RN <= FUType_RN;
             RegWrite_RN <= RegWrite_RN;
+            ROBWrite_en_RN <= ROBWrite_en_RN;
             ImmSel_RN <= ImmSel_RN;
             OpASel_RN <= OpASel_RN;
             OpBSel_RN <= OpBSel_RN;

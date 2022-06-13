@@ -39,7 +39,7 @@ module RAT (
     always @(posedge clk) begin
         if(rst) begin
             for(i = 0; i < 32; i = i + 1) begin
-                Valid[i]   <= 1'd0;
+                Valid[i]   <= 1'd1;
                 Value[i]   <= 32'd0;
                 ROBAddr[i] <= {`ROB_ENTRY_WIDTH{0}};
             end

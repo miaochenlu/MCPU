@@ -19,9 +19,9 @@ module ROB (
     
     // decode write
     input                               write_en,
-    input [4:0]                         waddr,
     input [31:0]                        pc_in,
-    input [31:0]                        inst_in,
+    input [6:0]                             OpCode_in,
+    input [4:0]                         waddr_in,
     input                               branch_pred_taken,
     output [`ROB_ENTRY_NUM:0]           ROB_windex,
 
@@ -56,8 +56,8 @@ module ROB (
 
     reg                                 Valid[`ROB_ENTRY_NUM:0];
     reg                                 Ready[`ROB_ENTRY_NUM:0];
-    reg [31:0]                          OpType[`ROB_ENTRY_NUM:0];
-    reg [31:0]                          PC_Inst[`ROB_ENTRY_NUM:0];
+    reg [6:0]                           OpCode[`ROB_ENTRY_NUM:0];
+    reg [31:0]                          PC[`ROB_ENTRY_NUM:0];
     reg [ 4:0]                          DestRegID[`ROB_ENTRY_NUM:0];
     reg [31:0]                          DestRegVal[`ROB_ENTRY_NUM:0];
     reg                                 PredTaken[`ROB_ENTRY_NUM:0];    // branch prediction
@@ -92,8 +92,8 @@ module ROB (
             for(i = 0; i <= `ROB_ENTRY_NUM; i = i + 1) begin
                 Valid[i]        <= 0;
                 Ready[i]        <= 0;
-                OpType[i]       <= 0;
-                PC_Inst[i]      <= 0;
+                OpCode[i]       <= 0;
+                PC[i]      <= 0;
                 DestRegID[i]    <= 0;
                 DestRegVal[i]   <= 0;
                 PredTaken[i]    <= 0;
@@ -110,12 +110,12 @@ module ROB (
             counter_plus  <= 0;
             counter_minus <= 0;
         /*****************************decode write****************************/
-            if(write_en && ~full) begin
+            if(write_en & ~full) begin
                 Valid[tail]         <= 1'd1;
                 Ready[tail]         <= 1'd0;
-                OpType[tail]        <= inst_in;
-                PC_Inst[tail]       <= pc_in;
-                DestRegID[tail]     <= waddr;
+                OpCode[tail]        <= OpCode_in;
+                PC[tail]       <= pc_in;
+                DestRegID[tail]     <= waddr_in;
                 DestRegVal[tail]    <= 32'd0;
                 PredTaken[i]        <= branch_pred_taken;
                 ActTaken[i]         <= 0;
@@ -132,7 +132,7 @@ module ROB (
             end
 
             if(CDB_LSQ_ROB_index != 0) begin
-                DestRegVal[CDB_LSQ_ROB_index] <= CDB_ALU_data;
+                DestRegVal[CDB_LSQ_ROB_index] <= CDB_LSQ_data;
                 Ready[CDB_LSQ_ROB_index]      <= 1'd1;
             end
 
@@ -145,7 +145,7 @@ module ROB (
 
         /*****************************commit****************************/
             if(~empty && (Ready[head])) begin
-                case(OpType[head])
+                case(OpCode[head])
                     `R_OP, `I_LOGIC_OP, `I_MEM_OP, `U_LUI_OP, `U_AUIPC_OP: begin
                         ROB_we                  <= 1'd1;
                         addr_commit             <= DestRegID[head];
@@ -166,7 +166,7 @@ module ROB (
                     end
                     `B_OP, `J_OP: begin
                         IsBranch_out            <= 1'd1;
-                        BranchInstPC_out        <= PC_Inst[head];
+                        BranchInstPC_out        <= PC[head];
                         BranchTaken_out         <= ActTaken[head];
                         MisPredict_out          <= (PredTaken[head] != ActTaken[head]);
                         JumpAddr_out            <= JumpAddr[head];
@@ -182,7 +182,7 @@ module ROB (
                         ROB_index_commit2reg    <= head;
 
                         IsBranch_out            <= 1'd1;
-                        BranchInstPC_out        <= PC_Inst[head];
+                        BranchInstPC_out        <= PC[head];
                         BranchTaken_out         <= ActTaken[head];
                         MisPredict_out          <= (PredTaken[head] != ActTaken[head]);
                         JumpAddr_out            <= JumpAddr[head]; 

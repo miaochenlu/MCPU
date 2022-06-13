@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 `include "defines.vh"
 module RSManager (
-    input FUType,
+    input  [2:0] FUType,
     output RSALU_we,
     output RSBRA_we,
     output RSLSQ_we

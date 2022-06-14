@@ -41,13 +41,13 @@ module RAT (
             for(i = 0; i < 32; i = i + 1) begin
                 Valid[i]   <= 1'd1;
                 Value[i]   <= 32'd0;
-                ROBAddr[i] <= {`ROB_ENTRY_WIDTH{0}};
+                ROBAddr[i] <= 0;
             end
         end
         else if(rollback) begin
             for(i = 0; i < 32; i = i + 1) begin
                 Valid[i]   <= 1'd1;
-                ROBAddr[i] <= {`ROB_ENTRY_WIDTH{0}};
+                ROBAddr[i] <= 0;
             end
         end
         else begin
@@ -55,7 +55,7 @@ module RAT (
                 Value[ROB_addr_commit]       <= ROB_data_commit;
                 if(ROB_index_commit == ROBAddr[ROB_addr_commit]) begin
                     Valid[ROB_addr_commit]   <= 1'd1;
-                    ROBAddr[ROB_addr_commit] <= {`ROB_ENTRY_WIDTH{0}};
+                    ROBAddr[ROB_addr_commit] <= 0;
                 end
             end
             

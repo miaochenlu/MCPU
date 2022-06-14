@@ -19,8 +19,11 @@ module BRA(
     always @(*) begin
         busy      = (BRAOp == 0) ? 1'd0 : 1'd1;
         Jump_en   = 0;
-        Dest_out  = 0;
+        JumpAddr  = 0;
+        Dest_val  = 0;
         res_ready = 1'd0;
+        
+        Dest_out  = Dest_in;
 
         case(BRAOp)
             `BEQ:  begin

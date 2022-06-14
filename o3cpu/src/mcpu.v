@@ -188,8 +188,8 @@ module MCPU (
 
     Mux21_32 M_Mux21_32_PCSrc(
         .in0(PC_p4),
-        .in1(CDB_BRA_JumpAddr),
-        .sel(CDB_BRA_Jump_en),
+        .in1(ROB_JumpAddr),
+        .sel(ROB_BranchTaken && ROB_IsBranch),
         .out(NextPC)
     );
     

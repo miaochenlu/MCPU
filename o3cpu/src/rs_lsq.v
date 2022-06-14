@@ -15,7 +15,7 @@ module RSLSQ (
     input [31:0]                        Vk_in,
     input [`ROB_ENTRY_WIDTH - 1:0]      Qj_in,
     input [`ROB_ENTRY_WIDTH - 1:0]      Qk_in,
-    input [`ROB_ENTRY_WIDTH - 1:0]      Offset_in,
+    input [31:0]                        Offset_in,
     input [`ROB_ENTRY_WIDTH - 1:0]      Dest_in,
 
     // CDB write result
@@ -170,6 +170,7 @@ module RSLSQ (
                     if(CDB_BRA_ROB_index == Qj[i]) begin
                         Vj[i] <= CDB_BRA_data;
                         Qj[i] <= 0;
+                        Addr[i] <= CDB_BRA_data + Offset[i];
                     end
                     if(CDB_BRA_ROB_index == Qk[i]) begin
                         Vk[i] <= CDB_BRA_data;
@@ -237,7 +238,6 @@ module RSLSQ (
                     Qk[tail] <= Qk_in;
                 end
 
-
                 tail         <= (tail == `RSLSQ_ENTRY_NUM) ? 1 : tail + 1;
                 counter_plus <= 1'd1;
             end
@@ -247,6 +247,7 @@ module RSLSQ (
                 /****************start to load*******************/
                 if(Status[head] == 1'd0) begin
                     Op_out          <= Op[head];
+                    Addr_out        <= Vj[head] + Offset[head];
                     Addr_out        <= Addr[head];
                     Status[head]    <= 1'd1; // start to execute
                 end
@@ -268,7 +269,8 @@ module RSLSQ (
             if(Busy[head] && (Op[head] & 4'b1000 == 4'b1000) && Qj[head] == 0 && Qk[head] == 0 && Commit[head] == 1'd1) begin
                 if(Status[head] == 1'd0) begin
                     Op_out          <= Op[head];
-                    Addr_out        <= Addr[head];
+                    Addr_out        <= Vj[head] + Offset[head];
+                    // Addr_out        <= Addr[head];
                     mem_wr_data     <= Vk[head];
                     Status[head]    <= 1'd1; // start to execute
                 end

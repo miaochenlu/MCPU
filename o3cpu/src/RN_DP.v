@@ -78,7 +78,7 @@ module RN_DP(
                 OpB_ROB_index_DP <= OpB_ROB_index_DP;
             end
             else if(flush) begin
-                PC_DP   <= PC_DP;
+                PC_DP   <= PC_RN;
                 inst_DP <= 32'h00000000;
                 OpCode_DP <= 0;
                 FUType_DP <= 0;

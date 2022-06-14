@@ -152,7 +152,7 @@ module RSBRA (
                 Busy[ExeRS_index]   <= 1'd0;
             end
 
-            if(issue_we && ~full) begin
+            if(issue_we && ~full && Op_in != 0) begin
                 Op[AllocRS_index]       <= Op_in;
                 Vj[AllocRS_index]       <= Vj_in;
                 Vk[AllocRS_index]       <= Vk_in;

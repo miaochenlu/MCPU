@@ -65,7 +65,7 @@ module ID_RN(
                 BRACtrl_RN <= BRACtrl_RN;
             end
             else if(flush) begin
-                PC_RN   <= PC_RN;
+                PC_RN   <= PC_ID;
                 inst_RN <= 32'h00000000;
                 OpCode_RN <= 0;
                 FUType_RN <= 0;

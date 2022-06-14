@@ -26,7 +26,7 @@ module IF_ID(
             end
             else if(flush) begin
                 PC_ID   <= PC_ID;
-                inst_ID <= 32'h00002003; // nop lw zero, 0(zero)
+                inst_ID <= 32'h00000000;
             end
             else begin
                 PC_ID   <= PC_IF;

@@ -70,8 +70,7 @@ module RSLSQ (
     
     assign empty = (counter == 0);
     assign full  = (counter >= `RSLSQ_ENTRY_NUM);
-    assign RS_windex = tail;
-    
+
     integer i;
 
     always @(posedge clk) begin
@@ -81,6 +80,8 @@ module RSLSQ (
         mem_wr_data <= 32'd0;
         rd_data     <= 32'd0;
         Dest_out    <= 0;
+        counter_plus  <= 0;
+        counter_minus <= 0;
 
         if(rst) begin
             for(i = 0; i <= `RSLSQ_ENTRY_NUM; i = i + 1) begin
@@ -134,8 +135,6 @@ module RSLSQ (
             
         end
         else begin
-            counter_plus  <= 0;
-            counter_minus <= 0;
             
             if(CDB_ALU_ROB_index != 0) begin
                 for(i = 1; i < `RSLSQ_ENTRY_NUM; i = i + 1) begin
@@ -182,7 +181,7 @@ module RSLSQ (
             // ROB store commit
             if(ROB_index_commit != 0) begin
                 for(i = 1; i <= `RSLSQ_ENTRY_NUM; i = i + 1) begin
-                    if(ROB_index_commit != 0 && ROB_index_commit == Dest[i] && ~Commit[i]) begin
+                    if(ROB_index_commit == Dest[i] && ~Commit[i]) begin
                         Commit[i]      <= 1'd1;
                         commit_pointer <= i;
                     end
@@ -191,7 +190,7 @@ module RSLSQ (
                     
 
             /*****************allocate entry in lsq*********************/
-            if(issue_we && ~full) begin
+            if(issue_we && (counter < `RSLSQ_ENTRY_NUM) && Op_in != 0) begin
                 Op[tail]     <= Op_in;
                 Vj[tail]     <= Vj_in;
                 Vk[tail]     <= Vk_in;
@@ -243,12 +242,11 @@ module RSLSQ (
             end
 
             // if load inst is ready
-            if((Busy[head] == 1'd1) && ((Op[head] & 4'b1000) == 4'd0) && (Qj[head] == {`ROB_ENTRY_WIDTH{0}})) begin
+            if((Busy[head] == 1'd1) && ((Op[head] & 4'b1000) == 4'd0) && (Qj[head] == 0)) begin
                 /****************start to load*******************/
                 if(Status[head] == 1'd0) begin
                     Op_out          <= Op[head];
                     Addr_out        <= Vj[head] + Offset[head];
-                    Addr_out        <= Addr[head];
                     Status[head]    <= 1'd1; // start to execute
                 end
                 /****************load finish*******************/
@@ -266,11 +264,10 @@ module RSLSQ (
             end
 
             // if store inst is ready to commit
-            if(Busy[head] && (Op[head] & 4'b1000 == 4'b1000) && Qj[head] == 0 && Qk[head] == 0 && Commit[head] == 1'd1) begin
+            if((Busy[head] == 1'd1) && ((Op[head] & 4'b1000) == 4'b1000) && Qj[head] == 0 && Qk[head] == 0 && Commit[head] == 1'd1) begin
                 if(Status[head] == 1'd0) begin
                     Op_out          <= Op[head];
                     Addr_out        <= Vj[head] + Offset[head];
-                    // Addr_out        <= Addr[head];
                     mem_wr_data     <= Vk[head];
                     Status[head]    <= 1'd1; // start to execute
                 end
@@ -279,18 +276,24 @@ module RSLSQ (
                     Op[head]        <= 1'd0;
                     Status[head]    <= 1'd0;
                     Commit[head]    <= 1'd0;
+                    Dest[head]      <= 1'd0;
 
-                    if(commit_pointer == head) commit_pointer = 0;  // the inst is committed
+                    if(commit_pointer == head) 
+                        commit_pointer <= 0;  // the inst is committed
 
                     head            <= (head == `RSLSQ_ENTRY_NUM) ? 1 : head + 1;
                     counter_minus   <= 1'd1;
                 end
             end
-            counter <= {`RSLSQ_ENTRY_WIDTH{ counter_plus &  counter_minus}} & counter
-                    || {`RSLSQ_ENTRY_WIDTH{ counter_plus & ~counter_minus}} & counter + 1
-                    || {`RSLSQ_ENTRY_WIDTH{~counter_plus &  counter_minus}} & counter - 1  
-                    || {`RSLSQ_ENTRY_WIDTH{~counter_plus & ~counter_minus}} & counter;
         end
+    end
+
+    always @(*) begin
+
+        counter = {`RSLSQ_ENTRY_WIDTH{ counter_plus &  counter_minus}} & counter
+                | {`RSLSQ_ENTRY_WIDTH{ counter_plus & ~counter_minus}} & counter + 1
+                | {`RSLSQ_ENTRY_WIDTH{~counter_plus &  counter_minus}} & counter - 1  
+                | {`RSLSQ_ENTRY_WIDTH{~counter_plus & ~counter_minus}} & counter;
     end
 
 endmodule

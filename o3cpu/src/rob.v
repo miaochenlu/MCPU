@@ -49,7 +49,7 @@ module ROB (
     input [31:0]                        CDB_LSQ_data,
 
     input                               CDB_BRA_Jump_en,
-    input                               CDB_BRA_JumpAddr,
+    input [31:0]                        CDB_BRA_JumpAddr,
     input [`ROB_ENTRY_WIDTH - 1:0]      CDB_BRA_ROB_index,
     input [31:0]                        CDB_BRA_data
 );
@@ -72,6 +72,7 @@ module ROB (
     integer i;
     assign empty = (counter == 0);
     assign full  = (counter >= `ROB_ENTRY_NUM);
+    wire inner_full = (counter >= `ROB_ENTRY_NUM);
     assign ROB_windex = tail;
 
     /*****************************decode read****************************/
@@ -93,7 +94,7 @@ module ROB (
                 Valid[i]        <= 0;
                 Ready[i]        <= 0;
                 OpCode[i]       <= 0;
-                PC[i]      <= 0;
+                PC[i]           <= 0;
                 DestRegID[i]    <= 0;
                 DestRegVal[i]   <= 0;
                 PredTaken[i]    <= 0;
@@ -129,7 +130,7 @@ module ROB (
             end
 
         /*****************************decode write****************************/
-            if(write_en & ~full) begin
+            if(write_en && ~inner_full && OpCode_in != 0) begin
                 Valid[tail]         <= 1'd1;
                 Ready[tail]         <= 1'd0;
                 OpCode[tail]        <= OpCode_in;
@@ -140,6 +141,9 @@ module ROB (
                 ActTaken[i]         <= 0;
                 JumpAddr[i]         <= 0;
 
+                if(OpCode_in == `S_OP) begin
+                    Ready[tail] <= 1'd1;
+                end
                 tail                <= (tail == `ROB_ENTRY_NUM) ? 1 : tail + 1;
                 counter_plus        <= 1'd1;
             end
@@ -195,18 +199,23 @@ module ROB (
                     end
                     default: begin
                         ROB_we <= 1'd0;
+                        counter_minus           <= 1'd0;
                     end
                 endcase
             end
             else begin
                 ROB_we <= 1'd0;
+                counter_minus           <= 1'd0;
             end
             
-            counter <= {`RSLSQ_ENTRY_WIDTH{ counter_plus &  counter_minus}} & counter
-                    || {`RSLSQ_ENTRY_WIDTH{ counter_plus & ~counter_minus}} & counter + 1
-                    || {`RSLSQ_ENTRY_WIDTH{~counter_plus &  counter_minus}} & counter - 1  
-                    || {`RSLSQ_ENTRY_WIDTH{~counter_plus & ~counter_minus}} & counter;
         end
+    end
+
+    always @(*) begin
+        counter = ({`ROB_ENTRY_WIDTH{ counter_plus &&  counter_minus}} & counter)
+                | ({`ROB_ENTRY_WIDTH{ counter_plus && ~counter_minus}} & (counter + 1))
+                | ({`ROB_ENTRY_WIDTH{~counter_plus &&  counter_minus}} & (counter - 1))  
+                | ({`ROB_ENTRY_WIDTH{~counter_plus && ~counter_minus}} & counter);
     end
 
 endmodule

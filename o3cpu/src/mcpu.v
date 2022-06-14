@@ -222,7 +222,7 @@ module MCPU (
     );
 
     HazardUnit M_HazardUnit (
-        .FUType(FUType_ID),
+        .FUType(FUType_DP),
         .ROB_full(ROB_full),
         .RSALU_full(RSALU_full),
         .RSLSQ_full(RSLSQ_full),
@@ -231,7 +231,9 @@ module MCPU (
         .PC_EN_IF(PC_EN_IF),
         .IF_ID_Stall(IF_ID_Stall),
         .IF_ID_Flush(IF_ID_Flush),
+        .ID_RN_Stall(ID_RN_Stall),
         .ID_RN_Flush(ID_RN_Flush),
+        .RN_DP_Stall(RN_DP_Stall),
         .RN_DP_Flush(RN_DP_Flush),
         .ROB_rollback(ROB_rollback),
         .RAT_rollback(RAT_rollback),
@@ -245,7 +247,7 @@ module MCPU (
         .rst(rst),
         .EN(ID_RN_EN),
         .flush(ID_RN_Flush),
-        .stall(1'd0),
+        .stall(ID_RN_Stall),
 
         .PC_ID(PC_ID),
         .inst_ID(inst_ID),
@@ -289,7 +291,7 @@ module MCPU (
         .rdata2(RAT_rdata2_RN),
         .ROB_index2_out(ROB_rindex2_RN),
         // register renaming  decode set dest reg
-        .dec_we(RegWrite_RN),
+        .dec_we(RegWrite_RN & (~ID_RN_Stall) & ~(ID_RN_Flush)),
         .waddr(inst_RN[11:7]),
         .ROB_index_in(ROB_windex),
         // ROB commit
@@ -302,6 +304,7 @@ module MCPU (
     ROB M_ROB (
         .clk(clk),
         .rst(rst),
+        .rollback(ROB_rollback),
         .full(ROB_full),
         .empty(ROB_empty),
         .ROB_rindex1(ROB_rindex1_RN),
@@ -313,10 +316,10 @@ module MCPU (
         .ready2(ROB_ready2_RN),
         
         // register renaming
-        .write_en(ROBWrite_en_RN), // every inst should have an ROB entry
+        .write_en(ROBWrite_en_RN & (~ID_RN_Stall) & (~ID_RN_Flush)), // every inst should have an ROB entry
         .pc_in(PC_RN),
         .OpCode_in(OpCode_RN),
-        .waddr_in(inst_RN[11:7]),
+        .waddr_in(inst_RN[11:7] & {5{RegWrite_RN}}),
         .branch_pred_taken(1'd0), //predict not taken
         .ROB_windex(ROB_windex),
 
@@ -391,9 +394,9 @@ module MCPU (
     RN_DP M_RN_DP (
         .clk(clk),
         .rst(rst),
-        .EN(ID_RN_EN),
-        .flush(ID_RN_Flush),
-        .stall(1'd0),
+        .EN(RN_DP_EN),
+        .flush(RN_DP_Flush),
+        .stall(RN_DP_Stall),
 
         .PC_RN(PC_RN),
         .inst_RN(inst_RN),
@@ -444,7 +447,7 @@ module MCPU (
         .rst(rst),
         .rollback(RSALU_rollback),
         .full(RSALU_full),
-        .issue_we(RSALU_we),
+        .issue_we(RSALU_we && (~RN_DP_Stall) && (~RN_DP_Flush)),
         .Op_in(ALUCtrl_DP),
         .Vj_in(OpAValue_DP),
         .Vk_in(OpBValue_DP),
@@ -469,7 +472,7 @@ module MCPU (
         .rollback(RSLSQ_rollback),
         .full(RSLSQ_full),
         .empty(),
-        .issue_we(RSLSQ_we),
+        .issue_we(RSLSQ_we && (~RN_DP_Stall) && (~RN_DP_Flush)),
         .Op_in(MemCtrl_DP),
         .Vj_in(OpAValue_DP),
         .Vk_in(OpBValue_DP),
@@ -499,7 +502,7 @@ module MCPU (
         .rst(rst),
         .rollback(RSBRA_rollback),
         .full(RSBRA_full),
-        .issue_we(RSBRA_we),
+        .issue_we(RSBRA_we && (~RN_DP_Stall) && (~RN_DP_Flush)),
         .Op_in(BRACtrl_DP),
         .Vj_in(OpAValue_DP),
         .Vk_in(OpBValue_DP),

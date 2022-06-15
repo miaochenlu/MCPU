@@ -1,15 +1,15 @@
 `timescale 1ns / 1ps
-`include "defines.v"
+`include "defines.vh"
 
 module RAM (
     input clk,
     input wr_en,
-    input [1:0] wr_ctrl,
-    input [2:0] rd_ctrl,
-    input [31:0] wr_addr,
-    input [31:0] wr_data,
-    input [31:0] rd_addr,
-    output reg [31:0] rd_data
+    input [ 1:0]        wr_ctrl,
+    input [ 2:0]        rd_ctrl,
+    input [31:0]        wr_addr,
+    input [31:0]        wr_data,
+    input [31:0]        rd_addr,
+    output reg [31:0]   rd_data
 );
             
     reg [7:0] mem[127:0];
@@ -38,13 +38,13 @@ module RAM (
                 `SB: mem[wr_addr[6:0]] <= wr_data[7:0];
                 `SH: begin
                         mem[wr_addr[6:0] + 1] <= wr_data[15:8];
-                        mem[wr_addr[6:0]] <= wr_data[7:0];
+                        mem[wr_addr[6:0]]     <= wr_data[7:0];
                     end
                 `SW: begin
                         mem[wr_addr[6:0] + 3] <= wr_data[31:24];
                         mem[wr_addr[6:0] + 2] <= wr_data[23:16];
                         mem[wr_addr[6:0] + 1] <= wr_data[15:8];
-                        mem[wr_addr[6:0]] <= wr_data[7:0];
+                        mem[wr_addr[6:0]]     <= wr_data[7:0];
                     end
                 default: mem[wr_addr[6:0]] <= mem[wr_addr[6:0]];
             endcase

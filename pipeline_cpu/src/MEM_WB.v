@@ -4,21 +4,22 @@ module MEM_WB(
     input clk,
     input rst,
     input EN,
-    input [31:0] PC_MEM,
-    input [31:0] inst_MEM,
-    input [31:0] ALURes_MEM,
-    input [31:0] MemRdData_MEM,
-    input RegWrite_MEM,
-    input [4:0] waddr_MEM,
-    input [1:0] Mem2Reg_MEM,
     
-    output reg [31:0] PC_WB,
-    output reg [31:0] inst_WB,
-    output reg [31:0] ALURes_WB,
-    output reg [31:0] MemRdData_WB,
-    output reg RegWrite_WB,
-    output reg [4:0] waddr_WB,
-    output reg Mem2Reg_WB
+    input [31:0]        PC_MEM,
+    input [31:0]        inst_MEM,
+    input [31:0]        ALURes_MEM,
+    input [31:0]        MemRdData_MEM,
+    input               RegWrite_MEM,
+    input [4:0]         waddr_MEM,
+    input [1:0]         Mem2Reg_MEM,
+    
+    output reg [31:0]   PC_WB,
+    output reg [31:0]   inst_WB,
+    output reg [31:0]   ALURes_WB,
+    output reg [31:0]   MemRdData_WB,
+    output reg          RegWrite_WB,
+    output reg [4:0]    waddr_WB,
+    output reg          Mem2Reg_WB
 );
     always @(posedge clk) begin
         if(rst) begin

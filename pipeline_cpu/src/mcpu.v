@@ -6,78 +6,78 @@ module MCPU(
 );
     
     // IF
-    wire PC_EN_IF;
-    wire IF_ID_EN; 
-    wire IF_ID_Stall;
-    wire IF_ID_Flush;
+    wire        PC_EN_IF;
+    wire        IF_ID_EN; 
+    wire        IF_ID_Stall;
+    wire        IF_ID_Flush;
     wire [31:0] PC_IF;
     wire [31:0] inst_IF;
     wire [31:0] NextPC;
     wire [31:0] PC_p4;
     
     // ID
-    wire ID_EX_EN;
-    wire ID_EX_Flush;
+    wire        ID_EX_EN;
+    wire        ID_EX_Flush;
     wire [31:0] PC_ID;
     wire [31:0] inst_ID;
-    wire RS1Use_ID;
-    wire RS2Use_ID;
-    wire [2:0] BrType_ID;
-    wire Jal;
-    wire Jalr;
-    wire [3:0] ImmSel_ID;
+    wire        RS1Use_ID;
+    wire        RS2Use_ID;
+    wire [ 2:0] BrType_ID;
+    wire        Jal;
+    wire        Jalr;
+    wire [ 3:0] ImmSel_ID;
     wire [31:0] imm_ID;
-    wire ALUSrcASel_ID;
-    wire ALUSrcBSel_ID;
-    wire [3:0] ALUCtrl_ID;
-    wire [2:0] MemRdCtrl_ID;
-    wire [1:0] MemWrCtrl_ID;
-    wire MemRW_ID;
-    wire RegWrite_ID;
-    wire [4:0] waddr_ID;
-    wire Mem2Reg_ID;
+    wire        ALUSrcASel_ID;
+    wire        ALUSrcBSel_ID;
+    wire [ 3:0] ALUCtrl_ID;
+    wire [ 2:0] MemRdCtrl_ID;
+    wire [ 1:0] MemWrCtrl_ID;
+    wire        MemRW_ID;
+    wire        RegWrite_ID;
+    wire [ 4:0] waddr_ID;
+    wire        Mem2Reg_ID;
     
     wire [31:0] rdata1_ID;
     wire [31:0] rdata2_ID;
     
-    wire DoJump;
-    wire JumpStall;
+    wire        DoJump;
+    wire        JumpStall;
     wire [31:0] JumpPC;
     wire [31:0] JumpPCBase;
     
-    wire [4:0] raddr1_ID;
-    wire [4:0] raddr2_ID;
+    wire [ 4:0] raddr1_ID;
+    wire [ 4:0] raddr2_ID;
     
     // EX
-    wire EX_MEM_EN;
+    wire        EX_MEM_EN;
     wire [31:0] PC_EX;
     wire [31:0] inst_EX;
     wire [ 4:0] raddr1_EX;
     wire [ 4:0] raddr2_EX;
-    wire RS1Use_EX;
-    wire RS2Use_EX;
+    wire        RS1Use_EX;
+    wire        RS2Use_EX;
     wire [31:0] rdata1_EX;
     wire [31:0] rdata2_EX;
     wire [31:0] imm_EX;
-    wire ALUSrcASel_EX;
-    wire ALUSrcBSel_EX;
-    wire [3:0] ALUCtrl_EX;
-    wire [2:0] MemRdCtrl_EX;
-    wire [1:0] MemWrCtrl_EX;
-    wire MemRW_EX;
-    wire RegWrite_EX;
-    wire [4:0] waddr_EX;
-    wire Mem2Reg_EX;
+    wire        ALUSrcASel_EX;
+    wire        ALUSrcBSel_EX;
+    wire [ 3:0] ALUCtrl_EX;
+    wire [ 2:0] MemRdCtrl_EX;
+    wire [ 1:0] MemWrCtrl_EX;
+    wire        MemRW_EX;
+    wire        RegWrite_EX;
+    wire [ 4:0] waddr_EX;
+    wire        Mem2Reg_EX;
     
     wire [31:0] ALUSrcA_EX;
     wire [31:0] ALUSrcB_EX;
     wire [31:0] ALURes_EX;
-    wire ALUZero_EX;
-    wire ALUOverflow_EX;
+    wire        ALUZero_EX;
+    wire        ALUOverflow_EX;
     
-    wire [1:0] ForwardA;
-    wire [1:0] ForwardB;
-    wire [1:0] ForwardWriteMem;
+    wire [ 1:0] ForwardA;
+    wire [ 1:0] ForwardB;
+    wire [ 1:0] ForwardWriteMem;
     
     wire [31:0] ALUSrcAForward;
     wire [31:0] ALUSrcBForward;
@@ -85,18 +85,17 @@ module MCPU(
     wire [31:0] MemWriteData_MEM;
     
     // MEM
-    wire MEM_WB_EN;
+    wire        MEM_WB_EN;
     wire [31:0] PC_MEM;
     wire [31:0] inst_MEM;
     wire [31:0] ALURes_MEM;
     wire [31:0] rdata2_MEM;
-    wire [31:0] rdata2_EX;
-    wire [2:0] MemRdCtrl_MEM;
-    wire [1:0] MemWrCtrl_MEM;
-    wire MemRW_MEM;
-    wire RegWrite_MEM;
-    wire [4:0] waddr_MEM;
-    wire Mem2Reg_MEM;
+    wire [ 2:0] MemRdCtrl_MEM;
+    wire [ 1:0] MemWrCtrl_MEM;
+    wire        MemRW_MEM;
+    wire        RegWrite_MEM;
+    wire [ 4:0] waddr_MEM;
+    wire        Mem2Reg_MEM;
     
     wire [31:0] MemRdData_MEM;
     
@@ -105,15 +104,15 @@ module MCPU(
     wire [31:0] inst_WB;
     wire [31:0] ALURes_WB;
     wire [31:0] MemRdData_WB;
-    wire RegWrite_WB;
-    wire [4:0] waddr_WB;
-    wire Mem2Reg_WB;
+    wire        RegWrite_WB;
+    wire [ 4:0] waddr_WB;
+    wire        Mem2Reg_WB;
     
     wire [31:0] wdata_WB;
     
 //    assign PC_EN_IF = 1;
-    assign IF_ID_EN = 1;
-    assign ID_EX_EN = 1;
+    assign IF_ID_EN  = 1;
+    assign ID_EX_EN  = 1;
     assign EX_MEM_EN = 1;
     assign MEM_WB_EN = 1;
     
@@ -173,7 +172,7 @@ module MCPU(
     
     assign raddr1_ID = inst_ID[19:15];
     assign raddr2_ID = inst_ID[24:20];
-    assign waddr_ID = inst_ID[11:7];
+    assign waddr_ID  = inst_ID[11:7];
     
     RegFile M_RegFile (
         .clk(~clk),
@@ -201,7 +200,7 @@ module MCPU(
     );
 
     assign JumpStall = BranchRes || Jal || Jalr;
-    assign DoJump  = BranchRes || Jal || Jalr;
+    assign DoJump    = BranchRes || Jal || Jalr;
     
     Mux21_32 M_Mux21_32_JumpBase (
         .in0(PC_ID),
@@ -275,7 +274,7 @@ module MCPU(
     
     // ***********************EX*****************************
     
-        ForwardUnit M_ForwardUnit(
+    ForwardUnit M_ForwardUnit(
         .raddr1_EX(raddr1_EX),
         .raddr2_EX(raddr2_EX),
         .RS1Use_EX(RS1Use_EX),

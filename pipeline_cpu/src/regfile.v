@@ -1,9 +1,9 @@
 `timescale 1ns / 1ps
 
 module RegFile(
-    input clk,
-    input rst,
-    input we, // write enable
+    input  clk,
+    input  rst,
+    input  we, // write enable
     input  [ 4:0] raddr1,
     output [31:0] rdata1,
     input  [ 4:0] raddr2,

@@ -5,43 +5,44 @@ module ID_EX(
     input rst,
     input EN,
     input flush,
-    input [31:0] PC_ID,
-    input [31:0] inst_ID,
-    input [ 4:0] raddr1_ID,
-    input [ 4:0] raddr2_ID,
-    input RS1Use_ID,
-    input RS2Use_ID,
-    input [31:0] rdata1_ID,
-    input [31:0] rdata2_ID,
-    input [31:0] imm_ID,
-    input ALUSrcASel_ID,
-    input ALUSrcBSel_ID,
-    input [3:0] ALUCtrl_ID,
-    input MemRW_ID,
-    input [2:0] MemRdCtrl_ID,
-    input [1:0] MemWrCtrl_ID,
-    input RegWrite_ID,
-    input [4:0] waddr_ID,
-    input Mem2Reg_ID,
     
-    output reg [31:0] PC_EX,
-    output reg [31:0] inst_EX,
-    output reg [ 4:0] raddr1_EX,
-    output reg [ 4:0] raddr2_EX,
-    output reg RS1Use_EX,
-    output reg RS2Use_EX,
-    output reg [31:0] rdata1_EX,
-    output reg [31:0] rdata2_EX,
-    output reg [31:0] imm_EX,
-    output reg ALUSrcASel_EX,
-    output reg ALUSrcBSel_EX,
-    output reg [3:0] ALUCtrl_EX,
-    output reg MemRW_EX,
-    output reg [2:0] MemRdCtrl_EX,
-    output reg [1:0] MemWrCtrl_EX,
-    output reg RegWrite_EX,
-    output reg [4:0] waddr_EX,
-    output reg Mem2Reg_EX
+    input [31:0]        PC_ID,
+    input [31:0]        inst_ID,
+    input [ 4:0]        raddr1_ID,
+    input [ 4:0]        raddr2_ID,
+    input               RS1Use_ID,
+    input               RS2Use_ID,
+    input [31:0]        rdata1_ID,
+    input [31:0]        rdata2_ID,
+    input [31:0]        imm_ID,
+    input               ALUSrcASel_ID,
+    input               ALUSrcBSel_ID,
+    input [3:0]         ALUCtrl_ID,
+    input               MemRW_ID,
+    input [2:0]         MemRdCtrl_ID,
+    input [1:0]         MemWrCtrl_ID,
+    input               RegWrite_ID,
+    input [4:0]         waddr_ID,
+    input               Mem2Reg_ID,
+    
+    output reg [31:0]   PC_EX,
+    output reg [31:0]   inst_EX,
+    output reg [ 4:0]   raddr1_EX,
+    output reg [ 4:0]   raddr2_EX,
+    output reg          RS1Use_EX,
+    output reg          RS2Use_EX,
+    output reg [31:0]   rdata1_EX,
+    output reg [31:0]   rdata2_EX,
+    output reg [31:0]   imm_EX,
+    output reg          ALUSrcASel_EX,
+    output reg          ALUSrcBSel_EX,
+    output reg [3:0]    ALUCtrl_EX,
+    output reg          MemRW_EX,
+    output reg [2:0]    MemRdCtrl_EX,
+    output reg [1:0]    MemWrCtrl_EX,
+    output reg          RegWrite_EX,
+    output reg [4:0]    waddr_EX,
+    output reg          Mem2Reg_EX
 );
     
     always @(posedge clk) begin
@@ -70,16 +71,6 @@ module ID_EX(
                 if(flush) begin
                     PC_EX           <= PC_ID;
                     inst_EX         <= 32'h00000000;
-//                    raddr1_EX       <= raddr1_ID;
-//                    raddr2_EX       <= raddr2_ID;
-//                    RS1Use_EX       <= RS1Use_ID;
-//                    RS2Use_EX       <= RS2Use_ID;
-//                    rdata1_EX       <= rdata1_ID;
-//                    rdata2_EX       <= rdata2_ID;
-//                    imm_EX          <= imm_ID;
-//                    ALUSrcASel_EX   <= 0;
-//                    ALUSrcBSel_EX   <= 0;
-//                    ALUCtrl_EX      <= 0;
                     MemRW_EX        <= 0;
                     MemRdCtrl_EX    <= 0;
                     MemWrCtrl_EX    <= 0;

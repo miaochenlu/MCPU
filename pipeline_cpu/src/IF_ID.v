@@ -6,16 +6,16 @@ module IF_ID(
     input EN,
     input flush,
     input stall,
-    input [31:0] PC_IF,
-    input [31:0] inst_IF,
+    input [31:0]        PC_IF,
+    input [31:0]        inst_IF,
     
-    output reg [31:0] PC_ID,
-    output reg [31:0] inst_ID
+    output reg [31:0]   PC_ID,
+    output reg [31:0]   inst_ID
 );
 
     always @(posedge clk) begin
         if(rst) begin
-            PC_ID <= 0;
+            PC_ID   <= 0;
             inst_ID <= 0;
         end
         else if(EN) begin

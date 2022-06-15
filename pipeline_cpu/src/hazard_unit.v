@@ -3,16 +3,16 @@
 module HazardUnit(
     input [4:0] raddr1_ID,
     input [4:0] raddr2_ID,
-    input RS1Use_ID,
-    input RS2Use_ID,
-    input MemWrite_ID,
+    input       RS1Use_ID,
+    input       RS2Use_ID,
+    input       MemWrite_ID,
     input [4:0] waddr_EX,
-    input MemRead_EX,
-    input JumpStall,
-    output PC_EN_IF,
-    output IF_ID_Flush,
-    output ID_EX_Flush,
-    output IF_ID_Stall
+    input       MemRead_EX,
+    input       JumpStall,
+    output      PC_EN_IF,
+    output      IF_ID_Flush,
+    output      ID_EX_Flush,
+    output      IF_ID_Stall
 );
     wire DataStall;
     assign DataStall = MemRead_EX && ~MemWrite_ID && 

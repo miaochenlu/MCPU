@@ -47,9 +47,11 @@
 `define OUTB  4'b1100
 
 `define NOFORWARD 2'b00
-`define FORWARD_A_MEM 2'b01
-`define FORWARD_A_WB  2'b10
-`define FORWARD_B_MEM 2'b01
-`define FORWARD_B_WB  2'b10
+`define FORWARD_A_ALU_MEM 2'b01
+`define FORWARD_A_ALU_WB  2'b10
+`define FORWARD_A_LOAD_WB 2'b11
+`define FORWARD_B_ALU_MEM 2'b01
+`define FORWARD_B_ALU_WB  2'b10
+`define FORWARD_B_LOAD_WB 2'b11
 `define FORWARD_WRITEMEM_MEM 2'b01
 `define FORWARD_WRITEMEM_ALU 2'b10

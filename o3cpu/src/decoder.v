@@ -116,8 +116,8 @@ module Decoder(
     assign OpASel = ({2{is_auipc}} & 2'b01)
                   | ({2{is_R_type | is_I_MEM_type | is_I_LOGIC_type | is_S_type}} & 2'b10);
                          // 0 for pc; 1 for reg
-    assign OpBSel = ({2{is_I_LOGIC_type}} & 2'b01)
-                  | ({2{is_R_type | is_B_type}} & 2'b10); // 2 for reg; 1 for imm
+    assign OpBSel = ({2{is_I_LOGIC_type | is_U_type}} & 2'b01)
+                  | ({2{is_R_type | is_B_type | is_S_type}} & 2'b10); // 2 for reg; 1 for imm
     
     assign ALUCtrl = {4{is_add | is_addi | is_auipc}} & `ADD
                    | {4{is_sub}} & `SUB

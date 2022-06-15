@@ -43,8 +43,10 @@ module ALU (
     wire addOverflow, subOverflow;
     assign addOverflow = ( ALUSrcA[31] &  ALUSrcB[31] & ~res[31]) 
                         |(~ALUSrcA[31] & ~ALUSrcB[31] &  res[31]);
+
     assign subOverflow = (~ALUSrcA[31] &  ALUSrcB[31] &  res[31])
                         |( ALUSrcA[31] & ~ALUSrcB[31] & ~res[31]);
+                        
     assign overflow = ((ALUOp == `ADD | ALUOp == `AP4) & addOverflow)
                      |((ALUOp == `SUB) & subOverflow);
 

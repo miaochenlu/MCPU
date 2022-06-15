@@ -2,18 +2,18 @@
 `include "defines.vh"
 
 module BRA(
-    input [ 3:0] BRAOp,
-    input [31:0] BRASrcA,
-    input [31:0] BRASrcB,
-    input [31:0] PC,
-    input [31:0] Offset,
-    input [`ROB_ENTRY_WIDTH - 1:0] Dest_in,
+    input [ 3:0]                        BRAOp,
+    input [31:0]                        BRASrcA,
+    input [31:0]                        BRASrcB,
+    input [31:0]                        PC,
+    input [31:0]                        Offset,
+    input [`ROB_ENTRY_WIDTH - 1:0]      Dest_in,
 
-    output reg busy,
-    output reg res_ready,
-    output reg Jump_en,
-    output reg [31:0] JumpAddr,
-    output reg [31:0] Dest_val,
+    output reg                          busy,
+    output reg                          res_ready,
+    output reg                          Jump_en,
+    output reg [31:0]                   JumpAddr,
+    output reg [31:0]                   Dest_val,
     output reg [`ROB_ENTRY_WIDTH - 1:0] Dest_out
 );
     always @(*) begin

@@ -1,5 +1,5 @@
 # MCPU
-tomasulo algorithm / cache / pipeline cpu / single cycle cpu
+tomasulo algorithm / cache / pipeline cpu / single cycle cpu (RISC-V)
 
 Todo
 - [x] Basic Tomasulo

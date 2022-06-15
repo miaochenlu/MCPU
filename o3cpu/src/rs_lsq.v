@@ -57,7 +57,6 @@ module RSLSQ (
     reg [`ROB_ENTRY_WIDTH - 1:0] Qk[`RSLSQ_ENTRY_NUM: 0];
     // memory address
     reg [31:0]                   Offset[`RSLSQ_ENTRY_NUM: 0];  // addr offset
-    reg [31:0]                   Addr[`RSLSQ_ENTRY_NUM: 0]; 
     reg [`ROB_ENTRY_WIDTH - 1:0] Dest[`RSLSQ_ENTRY_NUM: 0];
     reg                          Status[`RSLSQ_ENTRY_NUM: 0]; 
 
@@ -75,11 +74,11 @@ module RSLSQ (
 
     always @(posedge clk) begin
         // set default output
-        Op_out      <= 0;
-        Addr_out    <= 32'd0;
-        mem_wr_data <= 32'd0;
-        rd_data     <= 32'd0;
-        Dest_out    <= 0;
+        Op_out        <= 0;
+        Addr_out      <= 32'd0;
+        mem_wr_data   <= 32'd0;
+        rd_data       <= 32'd0;
+        Dest_out      <= 0;
         counter_plus  <= 0;
         counter_minus <= 0;
 
@@ -93,7 +92,6 @@ module RSLSQ (
                 Qj[i]       <= 0;
                 Qk[i]       <= 0;
                 Offset[i]   <= 0;
-                Addr[i]     <= 0;
                 Dest[i]     <= 0;
                 Status[i]   <= 0;
             end
@@ -127,7 +125,6 @@ module RSLSQ (
                     Qj[i]       <= 0;
                     Qk[i]       <= 0;
                     Offset[i]   <= 0;
-                    Addr[i]     <= 0;
                     Dest[i]     <= 0;
                     Status[i]   <= 0;
                 end
@@ -141,7 +138,6 @@ module RSLSQ (
                     if(CDB_ALU_ROB_index == Qj[i]) begin
                         Vj[i]   <= CDB_ALU_data;
                         Qj[i]   <= 0;
-                        Addr[i] <= CDB_ALU_data + Offset[i];
                     end
                     if(CDB_ALU_ROB_index == Qk[i]) begin
                         Vk[i]   <= CDB_ALU_data;
@@ -155,7 +151,6 @@ module RSLSQ (
                     if(CDB_LSQ_ROB_index == Qj[i]) begin
                         Vj[i]   <= CDB_LSQ_data;
                         Qj[i]   <= 0;
-                        Addr[i] <= CDB_LSQ_data + Offset[i];
                     end
                     if(CDB_LSQ_ROB_index == Qk[i]) begin
                         Vk[i]   <= CDB_LSQ_data;
@@ -169,7 +164,6 @@ module RSLSQ (
                     if(CDB_BRA_ROB_index == Qj[i]) begin
                         Vj[i] <= CDB_BRA_data;
                         Qj[i] <= 0;
-                        Addr[i] <= CDB_BRA_data + Offset[i];
                     end
                     if(CDB_BRA_ROB_index == Qk[i]) begin
                         Vk[i] <= CDB_BRA_data;
@@ -192,15 +186,10 @@ module RSLSQ (
             /*****************allocate entry in lsq*********************/
             if(issue_we && (counter < `RSLSQ_ENTRY_NUM) && Op_in != 0) begin
                 Op[tail]     <= Op_in;
-                Vj[tail]     <= Vj_in;
-                Vk[tail]     <= Vk_in;
-                Qj[tail]     <= Qj_in;
-                Qk[tail]     <= Qk_in;
                 Offset[tail] <= Offset_in;
                 Dest[tail]   <= Dest_in;
                 Commit[i]    <= 1'd0;
                 Busy[tail]   <= 1'd1;
-                Addr[tail]   <= (Qj_in == 0) ? (Vj_in + Offset_in) : 32'd0;
                 Status[tail] <= 1'd0;
 
                 if(CDB_ALU_ROB_index == Qj_in && CDB_ALU_ROB_index != 0) begin
@@ -260,7 +249,6 @@ module RSLSQ (
                     head            <= (head == `RSLSQ_ENTRY_NUM) ? 1 : head + 1;
                     counter_minus   <= 1'd1;
                 end
-
             end
 
             // if store inst is ready to commit
@@ -289,7 +277,6 @@ module RSLSQ (
     end
 
     always @(*) begin
-
         counter = {`RSLSQ_ENTRY_WIDTH{ counter_plus &  counter_minus}} & counter
                 | {`RSLSQ_ENTRY_WIDTH{ counter_plus & ~counter_minus}} & counter + 1
                 | {`RSLSQ_ENTRY_WIDTH{~counter_plus &  counter_minus}} & counter - 1  

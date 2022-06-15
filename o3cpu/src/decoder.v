@@ -2,15 +2,15 @@
 `include "defines.vh"
 
 module Decoder(
-    input [31:0] inst,
+    input [31:0]                 inst,
     // which fuction unit
-    output [2:0] FUType,
-    output [6:0] OpCode,
-    output       RegWrite,
-    output       ROBWrite_en,
-    output [3:0] ImmSel,
-    output [1:0] OpASel,
-    output [1:0] OpBSel,
+    output [`FU_WIDTH - 1:0]     FUType,
+    output [6:0]                 OpCode,
+    output                       RegWrite,
+    output                       ROBWrite_en,
+    output [3:0]                 ImmSel,
+    output [1:0]                 OpASel,
+    output [1:0]                 OpBSel,
 
     // ALU function unit
     output [`ALU_OP_WIDTH - 1:0] ALUCtrl,
@@ -97,13 +97,14 @@ module Decoder(
     wire is_B_type = is_beq | is_bne | is_blt | is_bge | is_bltu | is_bgeu;
     wire is_J_type = is_jal;
     wire is_U_type = is_lui | is_auipc;
+
 /*------------------------------------------------------------------------------------*/      
     // assign ctrl signals    
     
     // function unit
-    assign FUType = ({3{is_R_type | is_I_LOGIC_type | is_U_type}}) & `FU_ALU
-                  | ({3{is_I_MEM_type | is_S_type}} & `FU_LSQ)
-                  | ({3{is_B_type | is_J_type | is_jalr}} & `FU_BRA);
+    assign FUType = ({`FU_WIDTH{is_R_type | is_I_LOGIC_type | is_U_type}}) & `FU_ALU
+                  | ({`FU_WIDTH{is_I_MEM_type | is_S_type}} & `FU_LSQ)
+                  | ({`FU_WIDTH{is_B_type | is_J_type | is_jalr}} & `FU_BRA);
 
     assign RegWrite = is_R_type | is_I_type | is_U_type | is_J_type;                                                                          
     

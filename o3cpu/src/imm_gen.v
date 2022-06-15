@@ -2,9 +2,9 @@
 `include "defines.vh"
 
 module ImmGen(
-    input [31:0] inst,
-    input [2:0] ImmSel,
-    output [31:0] imm
+    input  [31:0]   inst,
+    input  [ 2:0]   ImmSel,
+    output [31:0]   imm
 );    
     
     assign imm = ({32{ImmSel == `I_TYPE_IMM}} & ({{20{inst[31]}}, inst[31:20]}))

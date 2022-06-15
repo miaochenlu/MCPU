@@ -2,33 +2,31 @@
 `include "defines.vh"
 
 module HazardUnit (
-    input [2:0] FUType,
-    input       ROB_full,
-    input       RSALU_full,
-    input       RSLSQ_full,
-    input       RSBRA_full,
-    input       MisPredict,
+    input [`FU_WIDTH - 1:0] FUType,
+    input ROB_full,
+    input RSALU_full,
+    input RSLSQ_full,
+    input RSBRA_full,
+    input MisPredict,
 
-    output      PC_EN_IF,
-    output      IF_ID_Stall,
-    output      IF_ID_Flush,
-    output      ID_RN_Stall,
-    output      ID_RN_Flush,
-    output      RN_DP_Stall,
-    output      RN_DP_Flush,
-    output      ROB_rollback,
-    output      RAT_rollback,
-    output      RSLSQ_rollback,
-    output      RSALU_rollback,
-    output      RSBRA_rollback
+    output PC_EN_IF,
+    output IF_ID_Stall,
+    output IF_ID_Flush,
+    output ID_RN_Stall,
+    output ID_RN_Flush,
+    output RN_DP_Stall,
+    output RN_DP_Flush,
+    output ROB_rollback,
+    output RAT_rollback,
+    output RSLSQ_rollback,
+    output RSALU_rollback,
+    output RSBRA_rollback
 );
 
     wire ControlStall = ROB_full
                       | ((FUType == `FU_ALU) && RSALU_full)
                       | ((FUType == `FU_LSQ) && RSLSQ_full)
                       | ((FUType == `FU_BRA) && RSBRA_full);
-
-
 
     assign ROB_rollback   = MisPredict;
     assign RAT_rollback   = MisPredict;

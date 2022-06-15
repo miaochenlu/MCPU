@@ -6,164 +6,164 @@ module MCPU (
     input rst
 );
     // Fetch
-    wire [31:0] PC_IF;
-    wire [31:0] inst_IF;
-    wire [31:0] NextPC; 
-    wire [31:0] PC_p4;
+    wire [31:0]                     PC_IF;
+    wire [31:0]                     inst_IF;
+    wire [31:0]                     NextPC; 
+    wire [31:0]                     PC_p4;
 
-    wire PC_EN_IF;
-    wire IF_ID_EN;
-    wire IF_ID_Stall;
-    wire IF_ID_Flush;
+    wire                            PC_EN_IF;
+    wire                            IF_ID_EN;
+    wire                            IF_ID_Stall;
+    wire                            IF_ID_Flush;
 
     // Decode
-    wire [31:0] PC_ID;
-    wire [31:0] inst_ID;
-    wire [6:0] OpCode_ID;
-    wire [2:0] FUType_ID;
-    wire RegWrite_ID;
-    wire ROBWrite_en_ID;
-    wire [3:0] ImmSel_ID;
-    wire [1:0] OpASel_ID;
-    wire [1:0] OpBSel_ID;
-    wire [`ALU_OP_WIDTH - 1:0] ALUCtrl_ID;
-    wire [`LSQ_OP_WIDTH - 1:0] MemCtrl_ID;
-    wire [`BRA_OP_WIDTH - 1:0] BRACtrl_ID;
+    wire [31:0]                     PC_ID;
+    wire [31:0]                     inst_ID;
+    wire [ 6:0]                     OpCode_ID;
+    wire [`FU_WIDTH - 1:0]          FUType_ID;
+    wire                            RegWrite_ID;
+    wire                            ROBWrite_en_ID;
+    wire [ 3:0]                     ImmSel_ID;
+    wire [ 1:0]                     OpASel_ID;
+    wire [ 1:0]                     OpBSel_ID;
+    wire [`ALU_OP_WIDTH - 1:0]      ALUCtrl_ID;
+    wire [`LSQ_OP_WIDTH - 1:0]      MemCtrl_ID;
+    wire [`BRA_OP_WIDTH - 1:0]      BRACtrl_ID;
 
-    wire ID_RN_EN;
-    wire ID_RN_Flush;
-    wire ID_RN_Stall;
+    wire                            ID_RN_EN;
+    wire                            ID_RN_Flush;
+    wire                            ID_RN_Stall;
 
     // Renaming
-    wire [31:0] PC_RN;
-    wire [31:0] inst_RN;
-    wire [6:0] OpCode_RN;
-    wire [2:0] FUType_RN;
-    wire RegWrite_RN;
-    wire ROBWrite_en_RN;
-    wire [3:0] ImmSel_RN;
-    wire [1:0] OpASel_RN;
-    wire [1:0] OpBSel_RN;
-    wire [`ALU_OP_WIDTH - 1:0] ALUCtrl_RN;
-    wire [`LSQ_OP_WIDTH - 1:0] MemCtrl_RN;
-    wire [`BRA_OP_WIDTH - 1:0] BRACtrl_RN;
+    wire [31:0]                     PC_RN;
+    wire [31:0]                     inst_RN;
+    wire [ 6:0]                     OpCode_RN;
+    wire [`FU_WIDTH - 1:0]          FUType_RN;
+    wire                            RegWrite_RN;
+    wire                            ROBWrite_en_RN;
+    wire [ 3:0]                     ImmSel_RN;
+    wire [ 1:0]                     OpASel_RN;
+    wire [ 1:0]                     OpBSel_RN;
+    wire [`ALU_OP_WIDTH - 1:0]      ALUCtrl_RN;
+    wire [`LSQ_OP_WIDTH - 1:0]      MemCtrl_RN;
+    wire [`BRA_OP_WIDTH - 1:0]      BRACtrl_RN;
 
-    wire RAT_rollback;
-    wire RAT_valid1_RN;
-    wire RAT_valid2_RN;
-    wire [31:0] RAT_rdata1_RN;
-    wire [31:0] RAT_rdata2_RN;
+    wire                            RAT_rollback;
+    wire                            RAT_valid1_RN;
+    wire                            RAT_valid2_RN;
+    wire [31:0]                     RAT_rdata1_RN;
+    wire [31:0]                     RAT_rdata2_RN;
 
-    wire ROB_full;
-    wire ROB_empty;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_rindex1_RN;
-    wire [31:0] ROB_rdata1_RN;
-    wire ROB_ready1_RN;
+    wire                            ROB_full;
+    wire                            ROB_empty;
+    wire                            ROB_rollback;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   ROB_rindex1_RN;
+    wire [31:0]                     ROB_rdata1_RN;
+    wire                            ROB_ready1_RN;
     
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_rindex2_RN;
-    wire [31:0] ROB_rdata2_RN;
-    wire ROB_ready2_RN;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   ROB_rindex2_RN;
+    wire [31:0]                     ROB_rdata2_RN;
+    wire                            ROB_ready2_RN;
 
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_windex;
-    wire ROB_we;
-    wire [ 4:0] ROB_addr_commit;
-    wire [31:0] ROB_data_commit;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_index_commit2reg;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_index_commit2lsq;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   ROB_windex;
+    wire                            ROB_we;
+    wire [ 4:0]                     ROB_addr_commit;
+    wire [31:0]                     ROB_data_commit;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   ROB_index_commit2reg;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   ROB_index_commit2lsq;
 
-    wire ROB_IsBranch;
-    wire [31:0] ROB_BranchInstPC;
-    wire ROB_BranchTaken;
-    wire ROB_MisPredict;
-    wire [31:0] ROB_JumpAddr;
+    wire                            ROB_IsBranch;
+    wire [31:0]                     ROB_BranchInstPC;
+    wire                            ROB_BranchTaken;
+    wire                            ROB_MisPredict;
+    wire [31:0]                     ROB_JumpAddr;
 
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_dest_RN;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   ROB_dest_RN;
 
-    wire [31:0] Imm_RN;
+    wire [31:0]                     Imm_RN;
 
-    wire [31:0] OpAValue_RN;
-    wire [`ROB_ENTRY_WIDTH - 1:0] OpA_ROB_index_RN;
-    wire [31:0] OpBValue_RN;
-    wire [`ROB_ENTRY_WIDTH - 1:0] OpB_ROB_index_RN;
+    wire [31:0]                     OpAValue_RN;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   OpA_ROB_index_RN;
+    wire [31:0]                     OpBValue_RN;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   OpB_ROB_index_RN;
 
-    wire RN_DP_EN;
-    wire RN_DP_Flush;
-    wire RN_DP_Stall;
+    wire                            RN_DP_EN;
+    wire                            RN_DP_Flush;
+    wire                            RN_DP_Stall;
 
     // Dispatch
 
-    wire [31:0] PC_DP;
-    wire [31:0] inst_DP;
-    wire [6:0] OpCode_DP;
-    wire [2:0] FUType_DP;
-    wire [1:0] OpASel_DP;
-    wire [1:0] OpBSel_DP;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ROB_dest_DP;
-    wire [`ALU_OP_WIDTH - 1:0] ALUCtrl_DP;
-    wire [`LSQ_OP_WIDTH - 1:0] MemCtrl_DP;
-    wire [`BRA_OP_WIDTH - 1:0] BRACtrl_DP;
-    wire [31:0] Imm_DP;
-    wire [31:0] OpAValue_DP;
-    wire [`ROB_ENTRY_WIDTH - 1:0] OpA_ROB_index_DP;
-    wire [31:0] OpBValue_DP;
-    wire [`ROB_ENTRY_WIDTH - 1:0] OpB_ROB_index_DP;
+    wire [31:0]                     PC_DP;
+    wire [31:0]                     inst_DP;
+    wire [ 6:0]                     OpCode_DP;
+    wire [`FU_WIDTH - 1:0]          FUType_DP;
+    wire [ 1:0]                     OpASel_DP;
+    wire [ 1:0]                     OpBSel_DP;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   ROB_dest_DP;
+    wire [`ALU_OP_WIDTH - 1:0]      ALUCtrl_DP;
+    wire [`LSQ_OP_WIDTH - 1:0]      MemCtrl_DP;
+    wire [`BRA_OP_WIDTH - 1:0]      BRACtrl_DP;
+    wire [31:0]                     Imm_DP;
+    wire [31:0]                     OpAValue_DP;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   OpA_ROB_index_DP;
+    wire [31:0]                     OpBValue_DP;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   OpB_ROB_index_DP;
 
-    wire RSALU_we;
-    wire RSBRA_we;
-    wire RSLSQ_we;
+    wire                            RSALU_we;
+    wire                            RSBRA_we;
+    wire                            RSLSQ_we;
 
-    wire RSALU_full;
-    wire RSLSQ_full;
-    wire RSBRA_full;
-    wire ROB_rollback;
-    wire RSALU_rollback;
-    wire RSLSQ_rollback;
-    wire RSBRA_rollback;
+    wire                            RSALU_full;
+    wire                            RSLSQ_full;
+    wire                            RSBRA_full;
+    wire                            RSALU_rollback;
+    wire                            RSLSQ_rollback;
+    wire                            RSBRA_rollback;
 
-    wire [`ALU_OP_WIDTH - 1:0] ALUOp;
-    wire [31:0] ALUSrcA;
-    wire [31:0] ALUSrcB;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ALUDest_in;
+    wire [`ALU_OP_WIDTH - 1:0]      ALUOp;
+    wire [31:0]                     ALUSrcA;
+    wire [31:0]                     ALUSrcB;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   ALUDest_in;
 
-    wire [`LSQ_OP_WIDTH - 1:0] LSQOp;
-    wire [31:0] LSQAddr;
+    wire [`LSQ_OP_WIDTH - 1:0]      LSQOp;
+    wire [31:0]                     LSQAddr;
 
-    wire [31:0] LSQ_rd_data;
-    wire [`ROB_ENTRY_WIDTH - 1:0] LSQDest_out;
+    wire [31:0]                     LSQ_rd_data;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   LSQDest_out;
 
-    wire [`BRA_OP_WIDTH - 1:0] BRAOp;
-    wire [31:0] BRASrcA;
-    wire [31:0] BRASrcB;
-    wire [31:0] BRAPC;
-    wire [31:0] BRAOffset;
-    wire [`ROB_ENTRY_WIDTH - 1:0] BRADest_in;
+    wire [`BRA_OP_WIDTH - 1:0]      BRAOp;
+    wire [31:0]                     BRASrcA;
+    wire [31:0]                     BRASrcB;
+    wire [31:0]                     BRAPC;
+    wire [31:0]                     BRAOffset;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   BRADest_in;
     // for alu
-    wire ALUBusy;
-    wire ALURes_ready;
-    wire [31:0] ALURes;
-    wire [`ROB_ENTRY_WIDTH - 1:0] ALUDest_out;
+    wire                            ALUBusy;
+    wire                            ALURes_ready;
+    wire [31:0]                     ALURes;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   ALUDest_out;
     // for ram
-    wire mem_rd_ready;
-    wire [31:0] mem_rd_data;
-    wire mem_wr_ready;
-    wire [31:0] mem_wr_data;
+    wire                            mem_rd_ready;
+    wire [31:0]                     mem_rd_data;
+    wire                            mem_wr_ready;
+    wire [31:0]                     mem_wr_data;
     // for bra
-    wire BRA_busy;
-    wire BRARes_ready;
-    wire BRAJump_en;
-    wire [31:0] BRAJumpAddr;
-    wire [31:0] BRA_Dest_val;
-    wire [`ROB_ENTRY_WIDTH - 1:0] BRADest_out;
+    wire                            BRA_busy;
+    wire                            BRARes_ready;
+    wire                            BRAJump_en;
+    wire [31:0]                     BRAJumpAddr;
+    wire [31:0]                     BRA_Dest_val;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   BRADest_out;
 
     // CDB
-    wire [31:0] CDB_ALU_data;
-    wire [`ROB_ENTRY_WIDTH - 1:0] CDB_ALU_ROB_index;
-    wire [31:0] CDB_LSQ_data;
-    wire [`ROB_ENTRY_WIDTH - 1:0] CDB_LSQ_ROB_index;
-    wire CDB_BRA_Jump_en;
-    wire [31:0] CDB_BRA_JumpAddr;
-    wire [31:0] CDB_BRA_data;
-    wire [`ROB_ENTRY_WIDTH - 1:0] CDB_BRA_ROB_index;
+    wire [31:0]                     CDB_ALU_data;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   CDB_ALU_ROB_index;
+    wire [31:0]                     CDB_LSQ_data;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   CDB_LSQ_ROB_index;
+    wire                            CDB_BRA_Jump_en;
+    wire [31:0]                     CDB_BRA_JumpAddr;
+    wire [31:0]                     CDB_BRA_data;
+    wire [`ROB_ENTRY_WIDTH - 1:0]   CDB_BRA_ROB_index;
     
     assign IF_ID_EN = 1;
     assign ID_RN_EN = 1;
@@ -568,7 +568,6 @@ module MCPU (
         .Dest_out(BRADest_out)
     );
 
-
     CDB M_CDB (
         .CDB_ALUData_in(ALURes),
         .CDB_ALUDest_in(ALUDest_out),
@@ -589,9 +588,5 @@ module MCPU (
         .CDB_BRAData_out(CDB_BRA_data),
         .CDB_BRADest_out(CDB_BRA_ROB_index)
     );
-/*******************write result*****************/
-
-
-/********************inst commit*****************/
 
 endmodule

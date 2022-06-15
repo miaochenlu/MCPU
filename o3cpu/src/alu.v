@@ -2,7 +2,7 @@
 `include "defines.vh"
 
 module ALU (
-    input [ 3:0]                        ALUOp,
+    input [`ALU_OP_WIDTH - 1:0]         ALUOp,
     input [31:0]                        ALUSrcA,
     input [31:0]                        ALUSrcB,
     input [`ROB_ENTRY_WIDTH - 1:0]      Dest_in,
@@ -32,7 +32,6 @@ module ALU (
             `SLT:  res = ($signed(ALUSrcA) < $signed(ALUSrcB)) ? 32'd1 : 32'd0;
             `SLTU: res = (ALUSrcA < ALUSrcB) ? 32'd1 : 32'd0;
             `SRA:  res = $signed(ALUSrcA) >>> ALUSrcB[4:0]; // arithemic shift >>>
-            `AP4:  res = ALUSrcA + 32'd4;
             `OUTB: res = ALUSrcB;
             default: res = 32'd0;
         endcase
@@ -46,8 +45,8 @@ module ALU (
 
     assign subOverflow = (~ALUSrcA[31] &  ALUSrcB[31] &  res[31])
                         |( ALUSrcA[31] & ~ALUSrcB[31] & ~res[31]);
-                        
-    assign overflow = ((ALUOp == `ADD | ALUOp == `AP4) & addOverflow)
+
+    assign overflow = ((ALUOp == `ADD) & addOverflow)
                      |((ALUOp == `SUB) & subOverflow);
 
     assign zero = ~|res;

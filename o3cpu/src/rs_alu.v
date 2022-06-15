@@ -129,20 +129,20 @@ module RSALU (
             end
 
             if(ExeRS_index != 0) begin
-                Op_out <= Op[ExeRS_index];
-                Vj_out <= Vj[ExeRS_index];
-                Vk_out <= Vk[ExeRS_index];
+                Op_out   <= Op[ExeRS_index];
+                Vj_out   <= Vj[ExeRS_index];
+                Vk_out   <= Vk[ExeRS_index];
                 Dest_out <= Dest[ExeRS_index];
                 
                 Busy[ExeRS_index] <= 1'd0;
             end
 
             if(issue_we && ~full && Op_in != 0) begin
-                Op[AllocRS_index] <= Op_in;
-                Vj[AllocRS_index] <= Vj_in;
-                Vk[AllocRS_index] <= Vk_in;
-                Qj[AllocRS_index] <= Qj_in;
-                Qk[AllocRS_index] <= Qk_in;
+                Op[AllocRS_index]   <= Op_in;
+                Vj[AllocRS_index]   <= Vj_in;
+                Vk[AllocRS_index]   <= Vk_in;
+                Qj[AllocRS_index]   <= Qj_in;
+                Qk[AllocRS_index]   <= Qk_in;
                 Dest[AllocRS_index] <= Dest_in;
                 Busy[AllocRS_index] <= 1'd1;
 

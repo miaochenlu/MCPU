@@ -2,7 +2,7 @@
 `include "defines.vh"
 
 module BRA(
-    input [ 3:0]                        BRAOp,
+    input [`BRA_OP_WIDTH - 1:0]         BRAOp,
     input [31:0]                        BRASrcA,
     input [31:0]                        BRASrcB,
     input [31:0]                        PC,
@@ -28,45 +28,27 @@ module BRA(
         case(BRAOp)
             `BEQ:  begin
                 Jump_en = (BRASrcA == BRASrcB);
-                if(Jump_en) 
-                    JumpAddr = PC + Offset;
-                else 
-                    JumpAddr = PC + 32'd4;
+                JumpAddr = Jump_en ? PC + Offset : PC + 32'd4;
             end
             `BNE:  begin
                 Jump_en = (BRASrcA != BRASrcB);
-                if(Jump_en) 
-                    JumpAddr = PC + Offset;
-                else 
-                    JumpAddr = PC + 32'd4;
+                JumpAddr = Jump_en ? PC + Offset : PC + 32'd4;
             end
             `BLT: begin
                 Jump_en = ($signed(BRASrcA) < $signed(BRASrcB));
-                if(Jump_en) 
-                    JumpAddr = PC + Offset;
-                else 
-                    JumpAddr = PC + 32'd4;
+                JumpAddr = Jump_en ? PC + Offset : PC + 32'd4;
             end
             `BGE: begin
                 Jump_en = ($signed(BRASrcA) > $signed(BRASrcB));
-                if(Jump_en) 
-                    JumpAddr = PC + Offset;
-                else 
-                    JumpAddr = PC + 32'd4;
+                JumpAddr = Jump_en ? PC + Offset : PC + 32'd4;
             end
             `BLTU:  begin
                 Jump_en = (BRASrcA < BRASrcB);
-                if(Jump_en) 
-                    JumpAddr = PC + Offset;
-                else 
-                    JumpAddr = PC + 32'd4;
+                JumpAddr = Jump_en ? PC + Offset : PC + 32'd4;
             end
             `BGEU:  begin
                 Jump_en = (BRASrcA >= BRASrcB);
-                if(Jump_en) 
-                    JumpAddr = PC + Offset;
-                else 
-                    JumpAddr = PC + 32'd4;
+                JumpAddr = Jump_en ? PC + Offset : PC + 32'd4;
             end
             `JAL: begin
                 Jump_en = 1'd1;

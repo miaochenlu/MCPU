@@ -10,17 +10,17 @@ module ROB (
     output empty,
     // decode read
     input [`ROB_ENTRY_WIDTH - 1:0]      ROB_rindex1,
-    output [31:0]                   ROB_rdata1,
+    output [31:0]                       ROB_rdata1,
     output                              ready1,
 
     input [`ROB_ENTRY_WIDTH - 1:0]      ROB_rindex2,
-    output [31:0]                   ROB_rdata2,
-    output                          ready2,
+    output [31:0]                       ROB_rdata2,
+    output                              ready2,
     
     // decode write
     input                               write_en,
     input [31:0]                        pc_in,
-    input [6:0]                             OpCode_in,
+    input [6:0]                         OpCode_in,
     input [4:0]                         waddr_in,
     input                               branch_pred_taken,
     output [`ROB_ENTRY_NUM:0]           ROB_windex,
@@ -72,7 +72,6 @@ module ROB (
     integer i;
     assign empty = (counter == 0);
     assign full  = (counter >= `ROB_ENTRY_NUM);
-    wire inner_full = (counter >= `ROB_ENTRY_NUM);
     assign ROB_windex = tail;
 
     /*****************************decode read****************************/
@@ -130,7 +129,7 @@ module ROB (
             end
 
         /*****************************decode write****************************/
-            if(write_en && ~inner_full && OpCode_in != 0) begin
+            if(write_en && ~full && OpCode_in != 0) begin
                 Valid[tail]         <= 1'd1;
                 Ready[tail]         <= 1'd0;
                 OpCode[tail]        <= OpCode_in;
@@ -144,8 +143,9 @@ module ROB (
                 if(OpCode_in == `S_OP) begin
                     Ready[tail] <= 1'd1;
                 end
-                tail                <= (tail == `ROB_ENTRY_NUM) ? 1 : tail + 1;
-                counter_plus        <= 1'd1;
+
+                tail          <= (tail == `ROB_ENTRY_NUM) ? 1 : tail + 1;
+                counter_plus  <= 1'd1;
             end
 
         /*****************************commit****************************/
@@ -198,14 +198,14 @@ module ROB (
                         counter_minus           <= 1'd1;
                     end
                     default: begin
-                        ROB_we <= 1'd0;
-                        counter_minus           <= 1'd0;
+                        ROB_we        <= 1'd0;
+                        counter_minus <= 1'd0;
                     end
                 endcase
             end
             else begin
-                ROB_we <= 1'd0;
-                counter_minus           <= 1'd0;
+                ROB_we        <= 1'd0;
+                counter_minus <= 1'd0;
             end
             
         end

@@ -23,7 +23,8 @@ module RegFile(
             end
         end
         else begin
-            if(we) reg_array[waddr] <= wdata;
+            if(we && waddr != 0) 
+                reg_array[waddr] <= wdata;
         end
     end
 

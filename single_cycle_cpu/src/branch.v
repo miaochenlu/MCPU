@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "defines.v"
+`include "defines.vh"
 
 module Branch (
     input [31:0] CmpSrcA,

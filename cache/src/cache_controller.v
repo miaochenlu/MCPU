@@ -20,25 +20,25 @@ module CacheController # (
     input clk,
     input rst,
     // cpu side port
-    input read_req,
-    input write_req,
-    input [31:0] addr,
-    input [ 1:0] wr_ctrl,
-    input [ 2:0] rd_ctrl,
-    input [31:0] wr_data,
-    output reg rd_data_valid,
-    output reg wr_ready,
-    output reg [31:0] rd_data,
+    input               read_req,
+    input               write_req,
+    input [31:0]        addr,
+    input [ 1:0]        wr_ctrl,
+    input [ 2:0]        rd_ctrl,
+    input [31:0]        wr_data,
+    output reg          rd_data_valid,
+    output reg          wr_ready,
+    output reg [ 31:0]  rd_data,
 
     // mem side port
-    input  [127:0] mem_rd_data,
-    input  mem_rd_data_valid,
-    input  mem_wr_data_ready,
-    output reg [31:0] mem_read_addr,
-    output reg [31:0] mem_write_addr,
-    output reg mem_read,
-    output reg mem_write,
-    output reg [127:0] mem_wr_data
+    input  [127:0]      mem_rd_data,
+    input               mem_rd_data_valid,
+    input               mem_wr_data_ready,
+    output reg [ 31:0]  mem_read_addr,
+    output reg [ 31:0]  mem_write_addr,
+    output reg          mem_read,
+    output reg          mem_write,
+    output reg [127:0]  mem_wr_data
 );
     localparam integer
         ST_IDLE = 3'd0,
@@ -50,27 +50,27 @@ module CacheController # (
     reg [1:0] next_state;
     
     // store the request related info
-    reg read_req_buf;
-    reg write_req_buf;
-    reg [31:0] addr_buf;
-    reg [WHOLE_DATA_WIDTH - 1:0] wr_data_buf;
-    reg [2:0] rd_ctrl_buf;
-    reg [1:0] wr_ctrl_buf;
+    reg                         read_req_buf;
+    reg                                 write_req_buf;
+    reg [ 31:0]                     addr_buf;
+    reg [WHOLE_DATA_WIDTH - 1:0]    wr_data_buf;
+    reg [  2:0]                     rd_ctrl_buf;
+    reg [  1:0]                     wr_ctrl_buf;
     
-    wire [1:0] word_offset = addr_buf[3:2];
-    wire [1:0] byte_offset = addr_buf[1:0];
-    wire  [3:0] wr_byte_en;
-    wire  [3:0] wr_word_en;
-    wire [3:0] wr_word_en_actual;
-    wire [3:0] wr_byte_en_actual;
+    wire [  1:0] word_offset = addr_buf[3:2];
+    wire [  1:0] byte_offset = addr_buf[1:0];
+    wire [  3:0] wr_byte_en;
+    wire [  3:0] wr_word_en;
+    wire [  3:0] wr_word_en_actual;
+    wire [  3:0] wr_byte_en_actual;
 
-    wire [4:0] set_index  = addr_buf[`INDEX_MSB:`INDEX_LSB];
-    wire [TAG_BITS - 1:0] addr_tag = addr_buf[`TAG_MSB:`TAG_LSB];
+    wire [4:0]            set_index  = addr_buf[`INDEX_MSB:`INDEX_LSB];
+    wire [TAG_BITS - 1:0] addr_tag   = addr_buf[`TAG_MSB:`TAG_LSB];
 
 
-    wire cache_write;
-    reg refill;
-    reg [CACHE_WAY_NUM - 1:0]    way_select;
+    wire                        cache_write;
+    reg                         refill;
+    reg [CACHE_WAY_NUM - 1:0]   way_select;
 
     reg fetch_write;
     reg hit_write;
@@ -92,7 +92,7 @@ module CacheController # (
     
     reg mem_rd_data_valid_buf;
 
-    wire hit = (|hit_arr);
+    wire hit   = (|hit_arr);
     wire valid = (|valid_arr);
 
     reg [CACHE_WAY_NUM - 1:0] LRU[(1 << ADDR_WIDTH) - 1:0];
@@ -117,8 +117,8 @@ module CacheController # (
                      | ({4{wr_ctrl_buf == `SW}} & 4'b1111);
  
     
-    assign wr_data_actual = fetch_write ? mem_rd_data : wr_data_buf;
-    assign cache_write    = fetch_write ? mem_rd_data_valid : hit_write; 
+    assign wr_data_actual    = fetch_write ? mem_rd_data : wr_data_buf;
+    assign cache_write       = fetch_write ? mem_rd_data_valid : hit_write; 
     assign wr_word_en_actual = fetch_write ? 4'b1111 : wr_word_en;
     assign wr_byte_en_actual = fetch_write ? 4'b1111 : wr_byte_en;
 
@@ -145,16 +145,16 @@ module CacheController # (
             wr_ready          <= 0;
 
             // initialize mem output
-            mem_read  <= 0;
-            mem_write <= 0;
-            mem_read_addr <= 0;
-            mem_write_addr <= 0;
-            mem_wr_data <= 0;
+            mem_read                <= 0;
+            mem_write               <= 0;
+            mem_read_addr           <= 0;
+            mem_write_addr          <= 0;
+            mem_wr_data             <= 0;
             
-            mem_rd_data_valid_buf <= 0;
+            mem_rd_data_valid_buf   <= 0;
             // initialize state
-            state <= ST_IDLE;
-            next_state <= ST_IDLE;
+            state                   <= ST_IDLE;
+            next_state              <= ST_IDLE;
 
             // initialize LRU
             for(i = 0; i < (1 << ADDR_WIDTH); i = i + 1) begin
@@ -164,19 +164,19 @@ module CacheController # (
         end
         else begin
             if(next_state == ST_IDLE) begin
-                rd_data_valid <= 0;
-                wr_ready <= 0;
-                read_req_buf <= read_req;
-                write_req_buf <= write_req;
-                addr_buf <= addr;
-                rd_ctrl_buf <= rd_ctrl;
-                wr_ctrl_buf <= wr_ctrl;
-                wr_data_buf <= {wr_data, wr_data, wr_data, wr_data};
-                mem_rd_data_valid_buf <= 0;
-                refill <= 0;
-                way_select <= 0;
-                fetch_write <= 0;
-                hit_write <= 0;
+                rd_data_valid           <= 0;
+                wr_ready                <= 0;
+                read_req_buf            <= read_req;
+                write_req_buf           <= write_req;
+                addr_buf                <= addr;
+                rd_ctrl_buf             <= rd_ctrl;
+                wr_ctrl_buf             <= wr_ctrl;
+                wr_data_buf             <= {wr_data, wr_data, wr_data, wr_data};
+                mem_rd_data_valid_buf   <= 0;
+                refill                  <= 0;
+                way_select              <= 0;
+                fetch_write             <= 0;
+                hit_write               <= 0;
             end
             state <= next_state;
         end
@@ -192,20 +192,20 @@ module CacheController # (
             end
             ST_LKUP: begin
                 if(hit && read_req_buf) begin
-                    rd_data_valid = 1;
-                    raw_read_data_128 = ({128{hit_arr[0]}} & rd_data_way0) | ({128{hit_arr[1]}} & rd_data_way1);
-                    LRU[set_index] = ({2{hit_arr[0]}} & 2'b01) | ({2{hit_arr[1]}} & 2'b10);
-                    next_state = ST_IDLE;
+                    rd_data_valid       = 1;
+                    raw_read_data_128   = ({128{hit_arr[0]}} & rd_data_way0) | ({128{hit_arr[1]}} & rd_data_way1);
+                    LRU[set_index]      = ({2{hit_arr[0]}} & 2'b01) | ({2{hit_arr[1]}} & 2'b10);
+                    next_state          = ST_IDLE;
                     // at the same time, control read words and bytes
                 end
                 else if(hit && write_req_buf) begin
-                    hit_write = 1;
-                    way_select = hit_arr;
-                    LRU[set_index] = ({2{hit_arr[0]}} & 2'b01) | ({2{hit_arr[1]}} & 2'b10);
+                    hit_write       = 1;
+                    way_select      = hit_arr;
+                    LRU[set_index]  = ({2{hit_arr[0]}} & 2'b01) | ({2{hit_arr[1]}} & 2'b10);
 
                     if(|write_data_ready_arr) begin
-                        wr_ready = 1;
-                        next_state = ST_IDLE;
+                        wr_ready    = 1;
+                        next_state  = ST_IDLE;
                     end
                 end
                 else if(~(&valid_arr) || ~(modify_arr[LRU[0]])) begin
@@ -219,74 +219,74 @@ module CacheController # (
                     end
                     else if(~(modify_arr[LRU[set_index][0]])) begin
                         if(LRU[set_index][0] == 1'b1) begin // replace way1
-                            way_select = 2'b10;
-                            LRU[set_index] = 2'b01;
+                            way_select      = 2'b10;
+                            LRU[set_index]  = 2'b01;
                        end
                        else begin               // replace way0
-                            way_select = 2'b01;
-                            LRU[set_index] = 2'b10;
+                            way_select      = 2'b01;
+                            LRU[set_index]  = 2'b10;
                        end
                     end
 
-                    mem_read_addr = {addr_tag, set_index, 4'b0};
-                    mem_read = 1'b1;
-                    next_state = ST_REFL;
+                    mem_read_addr   = {addr_tag, set_index, 4'b0};
+                    mem_read        = 1'b1;
+                    next_state      = ST_REFL;
                 end
                 else begin
 //                    fetch_write = 1;
 //                    refill = 1;
                     if(LRU[set_index][0] == 1'b1) begin // replace way1
-                        way_select = 2'b10;
-                        LRU[set_index] = 2'b01;
+                        way_select      = 2'b10;
+                        LRU[set_index]  = 2'b01;
                     end
                     else begin               // replace way0
-                        way_select = 2'b01;
-                        LRU[set_index] = 2'b10;
+                        way_select      = 2'b01;
+                        LRU[set_index]  = 2'b10;
                     end
 
-                    mem_read_addr = {addr_tag, set_index, 4'b0};
-                    mem_read = 1'b1;
-                    next_state = ST_WBAC;
+                    mem_read_addr   = {addr_tag, set_index, 4'b0};
+                    mem_read        = 1'b1;
+                    next_state      = ST_WBAC;
                 end
             end
         ST_WBAC: begin
             mem_write = 1;
             if(way_select == 2'b01) begin
-                mem_write_addr = {out_tag_way0, set_index, 4'b0};
-                mem_wr_data = rd_data_way0;
+                mem_write_addr  = {out_tag_way0, set_index, 4'b0};
+                mem_wr_data     = rd_data_way0;
             end
             else if(way_select == 2'b10) begin
-                mem_write_addr = {out_tag_way1, set_index, 4'b0};
-                mem_wr_data = rd_data_way1;
+                mem_write_addr  = {out_tag_way1, set_index, 4'b0};
+                mem_wr_data     = rd_data_way1;
             end
             else begin
-                mem_write_addr = 0;
-                mem_wr_data = 0;
+                mem_write_addr  = 0;
+                mem_wr_data     = 0;
             end
 
             if(mem_wr_data_ready) begin
-                mem_write = 0;
-                mem_write_addr = 0;
-                mem_wr_data = 0;
-                next_state = ST_REFL;
+                mem_write       = 0;
+                mem_write_addr  = 0;
+                mem_wr_data     = 0;
+                next_state      = ST_REFL;
             end
         end
 
         ST_REFL: begin
             if(mem_rd_data_valid) begin
                 mem_rd_data_valid_buf = mem_rd_data_valid;
-                mem_read = 0;
-                mem_read_addr = 0;
-                fetch_write = 1;
-                refill = 1;
+                mem_read        = 0;
+                mem_read_addr   = 0;
+                fetch_write     = 1;
+                refill          = 1;
             end
             if(mem_rd_data_valid_buf & (|refill_ready_arr)) begin
                 fetch_write = 0;
-                refill = 0;
+                refill      = 0;
                 if(read_req_buf) begin
-                    rd_data_valid = 1;
-                    raw_read_data_128 = mem_rd_data;
-                    next_state = ST_IDLE;
+                    rd_data_valid       = 1;
+                    raw_read_data_128   = mem_rd_data;
+                    next_state          = ST_IDLE;
                 end
                 else if(write_req_buf) begin
                     next_state = ST_LKUP;

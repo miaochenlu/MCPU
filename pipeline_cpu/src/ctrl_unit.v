@@ -111,7 +111,7 @@ module CtrlUnit(
                   
     assign RegWrite = is_R_type | is_I_type | is_U_type | is_J_type;  
     assign Mem2Reg = ({2{is_I_LOGIC_type | is_R_type | is_U_type | is_jalr | is_jal}} & 1'b0) // choose ALU
-               | ({2{is_I_MEM_type}} & 1'b1);                          // choose MEM
+                   | ({2{is_I_MEM_type}} & 1'b1);                          // choose MEM
                                 
     assign ALUCtrl = {4{is_add | is_addi | is_I_MEM_type | is_S_type | is_auipc}} & `ADD
                | {4{is_sub}} & `SUB

@@ -3,23 +3,24 @@
 module MemHier(
     input clk,
     input rst,
-    input read_req,
-    input write_req,
-    input [31:0] addr,
-    input [ 1:0] wr_ctrl,
-    input [ 2:0] rd_ctrl,
-    input [31:0] wr_data,
-    output rd_data_valid,
-    output wr_ready,
-    output [31:0] rd_data
+    
+    input           read_req,
+    input           write_req,
+    input [31:0]    addr,
+    input [ 1:0]    wr_ctrl,
+    input [ 2:0]    rd_ctrl,
+    input [31:0]    wr_data,
+    output          rd_data_valid,
+    output          wr_ready,
+    output [31:0]   rd_data
 );
     
-    wire mem_rd_data_valid;
-    wire mem_wr_data_ready;
+    wire        mem_rd_data_valid;
+    wire        mem_wr_data_ready;
     wire [31:0] mem_read_addr;
     wire [31:0] mem_write_addr;
-    wire mem_read;
-    wire mem_write;
+    wire        mem_read;
+    wire        mem_write;
     wire [127:0] mem_wr_data;
     wire [127:0] mem_rd_data;
     

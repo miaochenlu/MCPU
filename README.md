@@ -6,3 +6,9 @@ Todo
 - [ ] Branch Prediction
 - [ ] Exception Handling
 - [ ] DCache & ICache
+
+
+References:
+* https://github.com/XOR-op/TransistorU
+* https://github.com/ridecore/ridecore
+* https://github.com/dreamATD/TomRiVer-CPU

@@ -1,7 +1,5 @@
 `timescale 1ns / 1ps
 
-// https://github.com/XOR-op/TransistorU
-
 module ReorderBuffer (
     input  clk,
     input  rst,

@@ -8,13 +8,13 @@ module CacheRAM #(
 (
     input clk,
     input rst,
-    input wr_en,
-    input [ADDR_WIDTH - 1:0] wr_addr,
-    input [DATA_WIDTH - 1:0] wr_data,
-    input [DATA_BYTE_NUM - 1:0] wr_byte_en,  // byte enable
-    input [ADDR_WIDTH - 1:0] rd_addr,
-    output reg write_ready,
-    output reg [DATA_WIDTH - 1:0] rd_data
+    input                           wr_en,
+    input [ADDR_WIDTH - 1:0]        wr_addr,
+    input [DATA_WIDTH - 1:0]        wr_data,
+    input [DATA_BYTE_NUM - 1:0]     wr_byte_en,  // byte enable
+    input [ADDR_WIDTH - 1:0]        rd_addr,
+    output reg                      write_ready,
+    output reg [DATA_WIDTH - 1:0]   rd_data
 );
     
     // data store
@@ -44,7 +44,7 @@ module CacheRAM #(
             end
             else begin
                 // read
-                rd_data <= mem[rd_addr];
+                rd_data     <= mem[rd_addr];
                 write_ready <= 0;
             end
         end

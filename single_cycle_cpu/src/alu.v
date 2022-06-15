@@ -1,13 +1,13 @@
 `timescale 1ns / 1ps
-`include "defines.v"
+`include "defines.vh"
 
 module ALU (
-    input [31:0] ALUSrcA,
-    input [31:0] ALUSrcB,
-    input [3:0]  ALUCtrl,
-    output reg [31:0] res,
-    output zero,
-    output overflow
+    input [31:0]        ALUSrcA,
+    input [31:0]        ALUSrcB,
+    input [3:0]         ALUCtrl,
+    output reg [31:0]   res,
+    output              zero,
+    output              overflow
 );
 
     always @(*) begin

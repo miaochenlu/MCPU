@@ -4,50 +4,52 @@ module MCPU(
     input clk,
     input rst
 );
-    wire [31:0] pc, pc_plus4, jump_pc, next_pc;
+    wire [31:0] PC, PC_plus4, JumpPC, JumpPCBase, NextPC;
     
     wire [31:0] inst;
     
-    wire RegWrite;
+    wire        RegWrite;
     wire [31:0] rdata1, rdata2, wdata;
     
-    wire [2:0] ImmSel;
+    wire [ 2:0] ImmSel;
     wire [31:0] ImmOut;
     
-    wire ALUSrcASel, ALUSrcBSel;
+    wire        ALUSrcASel, ALUSrcBSel;
     wire [31:0] ALUSrcA, ALUSrcB;
     
-    wire [3:0] ALUCtrl;
+    wire [ 3:0] ALUCtrl;
     wire [31:0] ALURes;
-    wire ALUZero, ALUOverflow;
+    wire        ALUZero, ALUOverflow;
     
-    wire MemRW;
-    wire [2:0] MemRdCtrl;
-    wire [1:0] MemWrCtrl;
+    wire        MemRW;
+    wire [ 2:0] MemRdCtrl;
+    wire [ 1:0] MemWrCtrl;
     wire [31:0] MemRdData;
     
-    wire [1:0] Mem2Reg;
+    wire        Mem2Reg;
     
-    wire [2:0] BrType;
-    wire BranchRes; 
-    wire Jump;
+    wire [ 2:0] BrType;
+    wire        BranchRes; 
+    wire        Jal;
+    wire        Jalr;
     
     PC M_PC(
         .clk(clk), 
         .rst(rst), 
-        .pc_in(next_pc), 
-        .pc_out(pc)
+        .pc_in(NextPC), 
+        .pc_out(PC)
     );
     
     ROM M_ROM (
-        .addr(pc[8:2]),
+        .addr(PC[8:2]),
         .rd_data(inst)
     );
 
     CtrlUnit M_CtrlUnit (
         .inst(inst),
         .BrType(BrType),
-        .Jump(Jump),
+        .Jal(Jal),
+        .Jalr(Jalr),
         .ImmSel(ImmSel),
         .ALUSrcASel(ALUSrcASel),
         .ALUSrcBSel(ALUSrcBSel),
@@ -78,7 +80,7 @@ module MCPU(
     );
     
     Mux21_32 M_Mux21_32_ALUSrcA (
-        .in0(pc),
+        .in0(PC),
         .in1(rdata1),
         .sel(ALUSrcASel),
         .out(ALUSrcA)
@@ -98,10 +100,18 @@ module MCPU(
         .BranchRes(BranchRes)
     );
     
-    assign DoJump = BranchRes || Jump;
-    assign pc_plus4 = pc + 32'd4;
-    assign jump_pc = pc + ImmOut;
-    assign next_pc = DoJump ?  jump_pc : pc_plus4;
+    assign DoJump = BranchRes || Jal || Jalr;
+    
+    Mux21_32 M_Mux21_32_JumpBase (
+        .in0(PC),
+        .in1(rdata1),
+        .sel(Jalr),
+        .out(JumpPCBase)
+    );
+
+    assign JumpPC = JumpPCBase + ImmOut;
+    assign PC_plus4 = PC + 32'd4;
+    assign NextPC = DoJump ?  JumpPC : PC_plus4;
         
     ALU M_ALU (
         .ALUSrcA(ALUSrcA),
@@ -123,11 +133,9 @@ module MCPU(
         .rd_data(MemRdData)
     );
     
-    Mux41_32 M_Mux41_32_Writeback (
-        .in0(32'd0),
-        .in1(pc_plus4),
-        .in2(ALURes),
-        .in3(MemRdData),
+    Mux21_32 M_Mux21_32_Writeback (
+        .in0(ALURes),
+        .in1(MemRdData),
         .sel(Mem2Reg),
         .out(wdata)
     );

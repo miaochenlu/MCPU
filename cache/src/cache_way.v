@@ -11,20 +11,20 @@ module CacheWay # (
 (
     input clk,
     input rst,
-    input wr_en,                                // enable write
-    input refill,                               // refill using memory read data?
-    input [ADDR_WIDTH - 1:0] addr,              // index
-    input [TAG_BITS - 1:0] in_tag,              // input tag
-    input [WHOLE_DATA_WIDTH - 1:0] wr_data,     // write data
-    input [DATA_WORD_NUM - 1:0] wr_word_en,     // word enable
-    input [DATA_BYTE_NUM - 1:0] wr_byte_en,     // byte enable                               
-    output [TAG_BITS - 1:0] out_tag,            // read tag
-    output [WHOLE_DATA_WIDTH - 1:0] rd_data,    // read data
-    output valid,                               // valid data ?
-    output hit,                                 // cache hit ?
-    output modify,                              // data modified ?
-    output refill_ready,
-    output write_data_ready
+    input                           wr_en,          // enable write
+    input                           refill,         // refill using memory read data?
+    input [ADDR_WIDTH - 1:0]        addr,           // index
+    input [TAG_BITS - 1:0]          in_tag,         // input tag
+    input [WHOLE_DATA_WIDTH - 1:0]  wr_data,        // write data
+    input [DATA_WORD_NUM - 1:0]     wr_word_en,     // word enable
+    input [DATA_BYTE_NUM - 1:0]     wr_byte_en,     // byte enable                               
+    output [TAG_BITS - 1:0]         out_tag,        // read tag
+    output [WHOLE_DATA_WIDTH - 1:0] rd_data,        // read data
+    output                          valid,          // valid data ?
+    output                          hit,            // cache hit ?
+    output                          modify,         // data modified ?
+    output                          refill_ready,
+    output                          write_data_ready
 );
 
     /******************** Tag & Valid & Dirty *************************/
@@ -35,9 +35,9 @@ module CacheWay # (
     reg refill_buf;
     
     /******************* judge hit miss ... **************************/
-    assign valid = Valid[addr];
-    assign hit = valid && (Tag[addr] == in_tag);
-    assign modify = valid && Dirty[addr];
+    assign valid   = Valid[addr];
+    assign hit     = valid && (Tag[addr] == in_tag);
+    assign modify  = valid && Dirty[addr];
     assign out_tag = Tag[addr];
     
 
@@ -93,7 +93,7 @@ module CacheWay # (
     
     wire [3:0] write_ready;
     assign write_data_ready = (|write_ready) & (~refill_buf);
-    assign refill_ready = (|write_ready) & refill_buf;
+    assign refill_ready     = (|write_ready) & refill_buf;
     // data 2 cycles
     // 4 words per cache line
     CacheRAM Bank0 (.clk(clk), .rst(rst), .wr_en(write_bank0), .wr_addr(addr), .wr_data(write_data_bank0), .wr_byte_en(wr_byte_en), .rd_addr(addr), .write_ready(write_ready[0]), .rd_data(rd_data[31:0]));

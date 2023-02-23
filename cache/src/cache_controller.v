@@ -50,8 +50,8 @@ module CacheController # (
     reg [1:0] next_state;
     
     // store the request related info
-    reg                         read_req_buf;
-    reg                                 write_req_buf;
+    reg                             read_req_buf;
+    reg                             write_req_buf;
     reg [ 31:0]                     addr_buf;
     reg [WHOLE_DATA_WIDTH - 1:0]    wr_data_buf;
     reg [  2:0]                     rd_ctrl_buf;
@@ -109,12 +109,12 @@ module CacheController # (
     
     assign wr_byte_en = (~write_req_buf) ? 4'b0000 :
                         ({4{wr_ctrl_buf == `SB}} & ({32{byte_offset == 2'b00}} & 4'b0001)
-                                            | ({32{byte_offset == 2'b01}} & 4'b0010)
-                                            | ({32{byte_offset == 2'b10}} & 4'b0100)
-                                            | ({32{byte_offset == 2'b11}} & 4'b1000))
-                     | ({4{wr_ctrl_buf == `SH}} & ({32{byte_offset[1] == 1'b0}} & 4'b0011)
-                                            | ({32{byte_offset[1] == 1'b1}} & 4'b1100))
-                     | ({4{wr_ctrl_buf == `SW}} & 4'b1111);
+                      | ({32{byte_offset == 2'b01}} & 4'b0010)
+                      | ({32{byte_offset == 2'b10}} & 4'b0100)
+                      | ({32{byte_offset == 2'b11}} & 4'b1000))
+                      | ({4{wr_ctrl_buf == `SH}} & ({32{byte_offset[1] == 1'b0}} & 4'b0011)
+                      | ({32{byte_offset[1] == 1'b1}} & 4'b1100))
+                      | ({4{wr_ctrl_buf == `SW}} & 4'b1111);
  
     
     assign wr_data_actual    = fetch_write ? mem_rd_data : wr_data_buf;
